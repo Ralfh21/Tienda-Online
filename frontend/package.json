@@ -43,6 +43,7 @@
   },
   "proxy": "http://localhost:8080",
   "devDependencies": {
+    "@babel/core": "^7.28.5",
     "@babel/preset-env": "^7.28.5",
     "@babel/preset-react": "^7.28.5",
     "babel-jest": "^30.2.0"
@@ -51,6 +52,8 @@
     "transform": {
       "^.+\\.(js|jsx)$": "babel-jest"
     }
-  }
-
+  },
+  "transformIgnorePatterns": [
+    "/node_modules/(?!axios)/"
+  ]
 }

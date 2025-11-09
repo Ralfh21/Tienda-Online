@@ -11,71 +11,56 @@ import Login from './pages/Login';
 import Footer from './components/Footer';
 import './App.css';
 
-// Componente para proteger rutas de admin
+// 🔒 Componente para proteger rutas de admin
 const ProtectedAdminRoute = ({ children }) => {
-  const { user, isAdmin, loading } = useAuth();
+    const { user, isAdmin, loading } = useAuth();
 
-  if (loading) {
-    return <div className="text-center mt-5">Cargando...</div>;
-  }
+    if (loading) {
+        return <div className="text-center mt-5">Cargando...</div>;
+    }
 
-  if (!user || !isAdmin()) {
-    return <Navigate to="/login" replace />;
-  }
+    if (!user || !isAdmin()) {
+        return <Navigate to="/login" replace />;
+    }
 
-  return children;
-};
-
-// Componente para proteger rutas de cliente
-const ProtectedClientRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <div className="text-center mt-5">Cargando...</div>;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
+    return children;
 };
 
 function AppContent() {
-  return (
-    <div className="App">
-      <Navigation />
-      <main className="container-fluid py-4">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/productos" element={<ProductList />} />
-          <Route path="/producto/:id" element={<ProductDetail />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedAdminRoute>
-                <AdminPanel />
-              </ProtectedAdminRoute>
-            }
-          />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
-  );
+    return (
+        <div className="App">
+            <Navigation />
+            <main className="container-fluid py-4">
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/productos" element={<ProductList />} />
+                    <Route path="/producto/:id" element={<ProductDetail />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route
+                        path="/admin"
+                        element={
+                            <ProtectedAdminRoute>
+                                <AdminPanel />
+                            </ProtectedAdminRoute>
+                        }
+                    />
+                </Routes>
+            </main>
+            <Footer />
+        </div>
+    );
 }
 
 function App() {
-  return (
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </CartProvider>
-    </AuthProvider>
-  );
+    return (
+        <AuthProvider>
+            <CartProvider>
+                <Router>
+                    <AppContent />
+                </Router>
+            </CartProvider>
+        </AuthProvider>
+    );
 }
 
 export default App;

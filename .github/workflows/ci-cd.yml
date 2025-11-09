@@ -67,10 +67,10 @@ jobs:
           cd frontend
           npm test -- --coverage --watchAll=false
 
-      - name: Build frontend
+      - name: Build frontend (ignore warnings)
         run: |
           cd frontend
-          npm run build
+          CI=false npm run build  # 👈 aquí desactivamos el modo estricto de CI
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

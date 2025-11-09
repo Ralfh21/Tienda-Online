@@ -21,10 +21,16 @@ function Home() {
             const productos = productosResponse?.data || [];
             const categoriasList = categoriasResponse?.data || [];
 
-            // Filtrar solo productos con stock > 0 y mostrar los primeros 6
+            // ✅ Filtrar solo productos con stock > 0 y mostrar los primeros 6
             const productosDisponibles = productos.filter((p) => p.stock > 0);
             setProductosDestacados(productosDisponibles.slice(0, 6));
-            setCategorias(categoriasList);
+
+            // ✅ Eliminar categorías duplicadas por nombre
+            const categoriasUnicas = Array.from(
+                new Map(categoriasList.map((cat) => [cat.nombre, cat])).values()
+            );
+
+            setCategorias(categoriasUnicas);
         } catch (error) {
             console.error('Error al cargar datos:', error);
             setProductosDestacados([]);
@@ -33,6 +39,7 @@ function Home() {
             setLoading(false);
         }
     }, []);
+
 
     useEffect(() => {
         cargarDatos();

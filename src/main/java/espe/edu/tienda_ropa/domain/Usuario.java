@@ -28,6 +28,9 @@ public class Usuario {
     )
     private Set<Rol> roles;
 
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private Cliente cliente;
+
     // ===== Getters y Setters =====
 
     public Long getId() {
@@ -68,5 +71,13 @@ public class Usuario {
 
     public void setRoles(Set<Rol> roles) {
         this.roles = roles;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 }

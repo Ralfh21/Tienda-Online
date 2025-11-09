@@ -38,6 +38,10 @@ public class Cliente {
     @Column(nullable = false)
     private Boolean activo = true;
 
+    @OneToOne
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Usuario usuario;
+
     // Constructores
     public Cliente() {}
 
@@ -126,5 +130,13 @@ public class Cliente {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }

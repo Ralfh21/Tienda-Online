@@ -1,56 +1,43 @@
 @echo off
-color 0a
-echo.
-echo  ██████████████████████████████████████████████████
-echo  ██                                              ██
-echo  ██          🏪 TIENDA DE ROPA                   ██
-echo  ██          Iniciar Backend y Frontend          ██
-echo  ██                                              ██
-echo  ██████████████████████████████████████████████████
+echo ========================================
+echo   INICIANDO TIENDA DE ROPA - FULL STACK
+echo ========================================
 echo.
 
-echo ✅ PREREQUISITOS:
-echo    - XAMPP ejecutándose (Apache y MySQL)
-echo    - Base de datos 'tienda_ropa' creada
-echo.
-
-echo 🔍 Verificando XAMPP...
-timeout /t 2 /nobreak > nul
-
-echo.
-echo 🚀 INICIANDO BACKEND (Spring Boot)...
-echo    Puerto: 8080
-echo    URL API: http://localhost:8080/api/productos
-echo.
-
-start "🔧 Backend - Tienda de Ropa" cmd /k "echo Iniciando Spring Boot... && gradlew.bat bootRun"
-
-echo ⏳ Esperando que el backend inicie (30 segundos)...
-timeout /t 30 /nobreak > nul
-
-echo.
-echo 🌐 INICIANDO FRONTEND (React)...
-echo    Puerto: 3000
-echo    URL: http://localhost:3000
-echo.
-
-cd frontend
-start "🏪 Frontend - Tienda de Ropa" cmd /k "echo Iniciando React... && npm start"
-cd ..
-
-echo.
-echo ✅ ¡AMBOS SERVICIOS INICIADOS!
-echo.
-echo 📱 URLS DISPONIBLES:
-echo    🏠 Tienda:        http://localhost:3000
-echo    👨‍💼 Admin Panel:   http://localhost:3000/admin
-echo    ⚙️ API Backend:    http://localhost:8080/api/productos
-echo    🗄️ phpMyAdmin:     http://localhost/phpmyadmin
-echo.
-echo 🛑 PARA DETENER:
-echo    - Cierra las ventanas de Backend y Frontend
-echo    - O presiona Ctrl+C en cada ventana
-echo.
-echo 💡 TIP: Si algo no funciona, usa: iniciar_con_xampp.bat
+echo [1/3] Verificando XAMPP...
+echo Por favor asegurate de que MySQL este corriendo en XAMPP
 echo.
 pause
+
+echo [2/3] Iniciando Backend (Spring Boot)...
+echo.
+start "Backend - Spring Boot" cmd /k "cd /d %~dp0 && gradlew.bat bootRun"
+
+echo Esperando 15 segundos para que el backend inicie...
+timeout /t 15 /nobreak
+
+echo [3/3] Iniciando Frontend (React)...
+echo.
+start "Frontend - React" cmd /k "cd /d %~dp0frontend && npm start"
+
+echo.
+echo ========================================
+echo   SISTEMA INICIADO
+echo ========================================
+echo.
+echo Backend:  http://localhost:8080
+echo Frontend: http://localhost:3000
+echo.
+echo USUARIOS DE PRUEBA:
+echo.
+echo Administrador:
+echo   Email: admin@tiendaropa.com
+echo   Pass:  admin123
+echo.
+echo Cliente:
+echo   Email: maria.garcia@email.com
+echo   Pass:  password123
+echo.
+echo Presiona cualquier tecla para cerrar esta ventana...
+pause > nul
+

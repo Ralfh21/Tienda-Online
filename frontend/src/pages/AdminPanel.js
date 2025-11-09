@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Row, Col, Card, Button, Table, Form, Modal, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Table, Form, Modal, Alert, Badge } from 'react-bootstrap';
 import { productoService, categoriaService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 function AdminPanel() {
+    const { user } = useAuth();
     const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [showModal, setShowModal] = useState(false);
@@ -139,6 +141,17 @@ function AdminPanel() {
         <Container>
             <Row>
                 <Col>
+                    {/* Banner de bienvenida para administrador */}
+                    <Alert variant="info" className="mb-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 className="mb-1">
+                                🔧 Bienvenido, {user?.nombre}
+                                <Badge bg="danger" className="ms-2">Administrador</Badge>
+                            </h5>
+                            <small>Aquí puedes gestionar todos los productos de la tienda</small>
+                        </div>
+                    </Alert>
+
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h2>Panel de Administración</h2>
                         <Button variant="primary" onClick={() => setShowModal(true)}>

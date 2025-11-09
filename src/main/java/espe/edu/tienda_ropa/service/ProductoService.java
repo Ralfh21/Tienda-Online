@@ -1,68 +1,27 @@
 package espe.edu.tienda_ropa.service;
 
-import espe.edu.tienda_ropa.model.Producto;
-import espe.edu.tienda_ropa.repository.ProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import espe.edu.tienda_ropa.dto.ProductoRequestData;
+import espe.edu.tienda_ropa.dto.ProductoResponse;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
-public class ProductoService {
+public interface ProductoService {
 
-    @Autowired
-    private ProductoRepository productoRepository;
+    //Crear un producto a partir del DTO validado
+    ProductoResponse create(ProductoRequestData request);
 
-    public List<Producto> obtenerTodosLosProductos() {
-        return productoRepository.findAll();
-    }
+    //Busqueda por ID
+    ProductoResponse getById(Long id);
 
-    public Optional<Producto> obtenerProductoPorId(Long id) {
-        return productoRepository.findById(id);
-    }
+    //Listar todos los productos
+    List<ProductoResponse> list();
 
-    public Producto guardarProducto(Producto producto) {
-        return productoRepository.save(producto);
-    }
+    //Actualizar producto
+    ProductoResponse update(Long id, ProductoRequestData request);
 
-    public Producto actualizarProducto(Long id, Producto producto) {
-        if (productoRepository.existsById(id)) {
-            producto.setId(id);
-            return productoRepository.save(producto);
-        }
-        throw new RuntimeException("Producto no encontrado con id: " + id);
-    }
+    //Cambiar estado del producto (desactivar poniendo stock en 0)
+    ProductoResponse deactivate(Long id);
 
-    public void eliminarProducto(Long id) {
-        if (productoRepository.existsById(id)) {
-            productoRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Producto no encontrado con id: " + id);
-        }
-    }
-
-    public List<Producto> buscarPorCategoria(String categoria) {
-        return productoRepository.findByCategoria(categoria);
-    }
-
-    public List<Producto> buscarPorNombre(String nombre) {
-        return productoRepository.findByNombreContaining(nombre);
-    }
-
-    public List<Producto> obtenerProductosDisponibles() {
-        return productoRepository.findProductosDisponibles();
-    }
-
-    public List<String> obtenerCategorias() {
-        return productoRepository.findDistinctCategorias();
-    }
-
-    public List<String> obtenerTallas() {
-        return productoRepository.findDistinctTallas();
-    }
-
-    public List<String> obtenerColores() {
-        return productoRepository.findDistinctColores();
-    }
+    //Eliminar producto definitivamente
+    void delete(Long id);
 }

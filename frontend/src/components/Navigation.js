@@ -1,8 +1,12 @@
 import React from 'react';
-import { Navbar, Nav, Container, Form, FormControl, Button } from 'react-bootstrap';
+import { Navbar, Nav, Container, Badge } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useCart } from '../context/CartContext';
 
 function Navigation() {
+  const { getItemCount } = useCart();
+  const itemCount = getItemCount();
+
   return (
     <Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
       <Container>
@@ -24,15 +28,20 @@ function Navigation() {
             </LinkContainer>
           </Nav>
 
-          <Form className="d-flex">
-            <FormControl
-              type="search"
-              placeholder="Buscar productos..."
-              className="me-2"
-              aria-label="Buscar"
-            />
-            <Button variant="outline-light">Buscar</Button>
-          </Form>
+          <Nav className="ms-auto">
+            <Nav.Link href="#" className="position-relative">
+              🛒 Carrito 
+              {itemCount > 0 && (
+                <Badge 
+                  bg="danger" 
+                  className="position-absolute top-0 start-100 translate-middle"
+                  style={{ fontSize: '0.7em' }}
+                >
+                  {itemCount}
+                </Badge>
+              )}
+            </Nav.Link>
+          </Nav>
         </Navbar.Collapse>
       </Container>
     </Navbar>

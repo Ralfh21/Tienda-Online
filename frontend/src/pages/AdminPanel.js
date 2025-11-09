@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Button, Table, Form, Modal, Alert } from 'react-bootstrap';
-import { productoService } from '../services/api';
+import { productoService, categoriaService } from '../services/api';
 
 function AdminPanel() {
     const [productos, setProductos] = useState([]);
+    const [categorias, setCategorias] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -13,7 +14,7 @@ function AdminPanel() {
         nombre: '',
         descripcion: '',
         precio: '',
-        categoria: '',
+        categoriaId: '',
         talla: '',
         color: '',
         stock: '',
@@ -24,11 +25,15 @@ function AdminPanel() {
     const cargarProductos = useCallback(async () => {
         try {
             setLoading(true);
-            const response = await productoService.obtenerTodos();
-            setProductos(response?.data || []);
+            const [productosResponse, categoriasResponse] = await Promise.all([
+                productoService.obtenerTodos(),
+                categoriaService.obtenerTodos()
+            ]);
+            setProductos(productosResponse?.data || []);
+            setCategorias(categoriasResponse?.data || []);
         } catch (error) {
-            console.error('Error al cargar productos:', error);
-            mostrarAlerta('Error al cargar productos', 'danger');
+            console.error('Error al cargar datos:', error);
+            mostrarAlerta('Error al cargar datos', 'danger');
         } finally {
             setLoading(false);
         }
@@ -61,7 +66,6 @@ function AdminPanel() {
                 await productoService.crear(formData);
                 mostrarAlerta('Producto creado correctamente');
             }
-
             setShowModal(false);
             resetForm();
             cargarProductos();
@@ -77,7 +81,7 @@ function AdminPanel() {
             nombre: producto.nombre,
             descripcion: producto.descripcion || '',
             precio: producto.precio?.toString() || '',
-            categoria: producto.categoria || '',
+            categoriaId: producto.categoriaId?.toString() || '',
             talla: producto.talla || '',
             color: producto.color || '',
             stock: producto.stock?.toString() || '',
@@ -86,11 +90,24 @@ function AdminPanel() {
         setShowModal(true);
     };
 
+    const handleDeactivate = async (id) => {
+        if (window.confirm('¿Estás seguro de que quieres desactivar este producto? (Stock se pondrá en 0)')) {
+            try {
+                await productoService.desactivar(id);
+                mostrarAlerta('Producto desactivado correctamente');
+                cargarProductos();
+            } catch (error) {
+                console.error('Error al desactivar producto:', error);
+                mostrarAlerta('Error al desactivar producto', 'danger');
+            }
+        }
+    };
+
     const handleDelete = async (id) => {
-        if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+        if (window.confirm('⚠️ ¿Estás seguro de que quieres ELIMINAR PERMANENTEMENTE este producto? Esta acción NO se puede deshacer.')) {
             try {
                 await productoService.eliminar(id);
-                mostrarAlerta('Producto eliminado correctamente');
+                mostrarAlerta('Producto eliminado permanentemente', 'success');
                 cargarProductos();
             } catch (error) {
                 console.error('Error al eliminar producto:', error);
@@ -104,7 +121,7 @@ function AdminPanel() {
             nombre: '',
             descripcion: '',
             precio: '',
-            categoria: '',
+            categoriaId: '',
             talla: '',
             color: '',
             stock: '',
@@ -166,7 +183,7 @@ function AdminPanel() {
                                                 <td>{producto.id}</td>
                                                 <td>{producto.nombre}</td>
                                                 <td>${producto.precio}</td>
-                                                <td>{producto.categoria}</td>
+                                                <td>{producto.categoriaNombre}</td>
                                                 <td>{producto.talla}</td>
                                                 <td>{producto.color}</td>
                                                 <td>{producto.stock}</td>
@@ -174,10 +191,18 @@ function AdminPanel() {
                                                     <Button
                                                         variant="outline-primary"
                                                         size="sm"
-                                                        className="me-2"
+                                                        className="me-1"
                                                         onClick={() => handleEdit(producto)}
                                                     >
                                                         Editar
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline-warning"
+                                                        size="sm"
+                                                        className="me-1"
+                                                        onClick={() => handleDeactivate(producto.id)}
+                                                    >
+                                                        Desactivar
                                                     </Button>
                                                     <Button
                                                         variant="outline-danger"
@@ -257,17 +282,17 @@ function AdminPanel() {
                                 <Form.Group className="mb-3">
                                     <Form.Label>Categoría *</Form.Label>
                                     <Form.Select
-                                        name="categoria"
-                                        value={formData.categoria}
+                                        name="categoriaId"
+                                        value={formData.categoriaId}
                                         onChange={handleInputChange}
                                         required
                                     >
                                         <option value="">Seleccionar categoría</option>
-                                        <option value="Camisetas">Camisetas</option>
-                                        <option value="Pantalones">Pantalones</option>
-                                        <option value="Vestidos">Vestidos</option>
-                                        <option value="Zapatos">Zapatos</option>
-                                        <option value="Accesorios">Accesorios</option>
+                                        {categorias.map(categoria => (
+                                            <option key={categoria.id} value={categoria.id}>
+                                                {categoria.nombre}
+                                            </option>
+                                        ))}
                                     </Form.Select>
                                 </Form.Group>
                             </Col>

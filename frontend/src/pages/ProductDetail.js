@@ -2,13 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Alert } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { productoService } from '../services/api';
+import { useCart } from '../context/CartContext';
 
 function ProductDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { addToCart } = useCart();
     const [producto, setProducto] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [adding, setAdding] = useState(false);
 
     // ✅ Usamos useCallback para que no genere warning en el useEffect
     const cargarProducto = useCallback(async () => {
@@ -170,9 +173,16 @@ function ProductDetail() {
                             <Button
                                 variant="success"
                                 size="lg"
-                                disabled={producto.stock === 0}
+                                disabled={producto.stock === 0 || adding}
+                                onClick={async () => {
+                                    if (producto.stock > 0) {
+                                        setAdding(true);
+                                        addToCart(producto);
+                                        setTimeout(() => setAdding(false), 1000);
+                                    }
+                                }}
                             >
-                                {producto.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock'}
+                                {adding ? '✓ ¡Agregado al Carrito!' : producto.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock'}
                             </Button>
 
                             <Button

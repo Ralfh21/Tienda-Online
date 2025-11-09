@@ -1,8 +1,6 @@
-package espe.edu.tienda_ropa.model;
+package espe.edu.tienda_ropa.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-
 import java.math.BigDecimal;
 
 @Entity
@@ -13,46 +11,36 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "El nombre es obligatorio")
-    @Size(max = 100, message = "El nombre no puede exceder 100 caracteres")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Size(max = 500, message = "La descripción no puede exceder 500 caracteres")
+    @Column(length = 500)
     private String descripcion;
 
-    @NotNull(message = "El precio es obligatorio")
-    @DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor a 0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
 
-    @NotBlank(message = "La categoría es obligatoria")
-    @Column(nullable = false)
-    private String categoria;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoria_id")
-    private Categoria categoriaObj;
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
 
-    @NotBlank(message = "La talla es obligatoria")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String talla;
 
-    @NotBlank(message = "El color es obligatorio")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 30)
     private String color;
 
-    @Min(value = 0, message = "El stock no puede ser negativo")
     @Column(nullable = false)
     private Integer stock = 0;
 
     private String imagenUrl;
 
+
     // Constructores
     public Producto() {}
 
     public Producto(String nombre, String descripcion, BigDecimal precio,
-                   String categoria, String talla, String color, Integer stock) {
+                   Categoria categoria, String talla, String color, Integer stock) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
@@ -95,11 +83,11 @@ public class Producto {
         this.precio = precio;
     }
 
-    public String getCategoria() {
+    public Categoria getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 
@@ -133,13 +121,5 @@ public class Producto {
 
     public void setImagenUrl(String imagenUrl) {
         this.imagenUrl = imagenUrl;
-    }
-
-    public Categoria getCategoriaObj() {
-        return categoriaObj;
-    }
-
-    public void setCategoriaObj(Categoria categoriaObj) {
-        this.categoriaObj = categoriaObj;
     }
 }

@@ -1,9 +1,6 @@
-package espe.edu.tienda_ropa.model;
+package espe.edu.tienda_ropa.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-
-import java.util.List;
 
 @Entity
 @Table(name = "categorias")
@@ -13,20 +10,14 @@ public class Categoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "El nombre de la categoría es obligatorio")
-    @Size(max = 50, message = "El nombre no puede exceder 50 caracteres")
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String nombre;
 
-    @Size(max = 200, message = "La descripción no puede exceder 200 caracteres")
+    @Column(length = 200)
     private String descripcion;
 
     @Column(nullable = false)
     private Boolean activa = true;
-
-    // Relación con productos
-    @OneToMany(mappedBy = "categoriaObj", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Producto> productos;
 
     // Constructores
     public Categoria() {}
@@ -34,7 +25,6 @@ public class Categoria {
     public Categoria(String nombre, String descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.activa = true;
     }
 
     // Getters y Setters
@@ -68,13 +58,5 @@ public class Categoria {
 
     public void setActiva(Boolean activa) {
         this.activa = activa;
-    }
-
-    public List<Producto> getProductos() {
-        return productos;
-    }
-
-    public void setProductos(List<Producto> productos) {
-        this.productos = productos;
     }
 }

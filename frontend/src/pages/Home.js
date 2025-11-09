@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { productoService } from '../services/api';
+import { productoService, categoriaService } from '../services/api';
 import ProductCard from '../components/ProductCard';
 
 function Home() {
@@ -13,16 +13,19 @@ function Home() {
         try {
             setLoading(true);
             const [productosResponse, categoriasResponse] = await Promise.all([
-                productoService.obtenerDisponibles(),
-                productoService.obtenerCategorias(),
+                productoService.obtenerTodos(),
+                categoriaService.obtenerTodos(),
             ]);
 
             // ✅ Validación segura contra undefined o respuestas vacías
             const productos = productosResponse?.data || [];
             const categoriasList = categoriasResponse?.data || [];
 
-            // Mostrar solo los primeros 6 productos destacados
-            setProductosDestacados(productos.slice(0, 6));
+            // Filtrar solo productos con stock > 0 y mostrar los primeros 6
+            const productosDisponibles = productos.filter(p => p.stock > 0);
+            setProductosDestacados(productosDisponibles.slice(0, 6));
+
+            // Usar objetos completos de categorías 
             setCategorias(categoriasList);
         } catch (error) {
             console.error('Error al cargar datos:', error);
@@ -67,13 +70,13 @@ function Home() {
                     <Row>
                         {categorias.length > 0 ? (
                             categorias.map((categoria) => (
-                                <Col md={3} sm={6} key={categoria} className="mb-3">
+                                <Col md={3} sm={6} key={categoria.id} className="mb-3">
                                     <Card className="text-center h-100">
                                         <Card.Body>
-                                            <Card.Title>{categoria}</Card.Title>
-                                            <Link to={`/productos?categoria=${categoria}`}>
+                                            <Card.Title>{categoria.nombre}</Card.Title>
+                                            <Link to={`/productos?categoria=${categoria.nombre}`}>
                                                 <Button variant="outline-primary">
-                                                    Ver {categoria}
+                                                    Ver {categoria.nombre}
                                                 </Button>
                                             </Link>
                                         </Card.Body>

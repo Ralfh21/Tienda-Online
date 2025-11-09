@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Button, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 function ProductCard({ producto }) {
-  const { id, nombre, descripcion, precio, categoria, talla, color, stock, imagenUrl } = producto;
+  const { id, nombre, descripcion, precio, categoriaNombre, talla, color, stock, imagenUrl } = producto;
+  const { addToCart } = useCart();
+  const [adding, setAdding] = useState(false);
 
   return (
     <Card className="h-100 mb-4">
@@ -20,7 +23,7 @@ function ProductCard({ producto }) {
         </Card.Text>
 
         <div className="mb-2">
-          <Badge bg="secondary" className="me-2">{categoria}</Badge>
+          <Badge bg="secondary" className="me-2">{categoriaNombre}</Badge>
           <Badge bg="info" className="me-2">Talla {talla}</Badge>
           <Badge bg="warning" text="dark">{color}</Badge>
         </div>
@@ -44,10 +47,18 @@ function ProductCard({ producto }) {
             </Link>
             <Button
               variant="success"
-              disabled={stock === 0}
+              disabled={stock === 0 || adding}
               className="w-100"
+              onClick={async () => {
+                if (stock > 0) {
+                  setAdding(true);
+                  addToCart(producto);
+                  // Pequeña pausa para feedback visual
+                  setTimeout(() => setAdding(false), 500);
+                }
+              }}
             >
-              {stock > 0 ? 'Agregar al Carrito' : 'Sin Stock'}
+              {adding ? '✓ Agregado!' : stock > 0 ? 'Agregar al Carrito' : 'Sin Stock'}
             </Button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
-import { productoService } from '../services/api';
+import { productoService, categoriaService } from '../services/api';
 import ProductCard from '../components/ProductCard';
 
 function ProductList() {
@@ -22,52 +22,71 @@ function ProductList() {
             setLoading(true);
             const [
                 productosResponse,
-                categoriasResponse,
-                tallasResponse,
-                coloresResponse
+                categoriasResponse
             ] = await Promise.all([
                 productoService.obtenerTodos(),
-                productoService.obtenerCategorias(),
-                productoService.obtenerTallas(),
-                productoService.obtenerColores()
+                categoriaService.obtenerTodos()
             ]);
 
-            setProductos(productosResponse?.data || []);
-            setCategorias(categoriasResponse?.data || []);
-            setTallas(tallasResponse?.data || []);
-            setColores(coloresResponse?.data || []);
+            const productosData = productosResponse?.data || [];
+            const categoriasData = categoriasResponse?.data || [];
+            
+            setProductosOriginales(productosData);
+            setProductos(productosData);
+
+            // Usar objetos completos de categorías
+            setCategorias(categoriasData);
+
+            // Extraer tallas y colores únicos de los productos
+            const tallasUnicas = [...new Set(productosData.map(p => p.talla).filter(Boolean))];
+            const coloresUnicos = [...new Set(productosData.map(p => p.color).filter(Boolean))];
+
+            setTallas(tallasUnicas);
+            setColores(coloresUnicos);
         } catch (error) {
             console.error('Error al cargar productos:', error);
             setProductos([]);
+            setCategorias([]);
+            setTallas([]);
+            setColores([]);
         } finally {
             setLoading(false);
         }
     }, []);
 
-    const filtrarProductos = useCallback(async () => {
+    // Agregar estado para productos originales
+    const [productosOriginales, setProductosOriginales] = useState([]);
+
+    const filtrarProductos = useCallback(() => {
         try {
-            let productosResponse;
+            let productosFiltrados = [...productosOriginales];
 
+            // Filtrar por búsqueda (nombre)
             if (busqueda) {
-                productosResponse = await productoService.buscarPorNombre(busqueda);
-            } else if (categoriaSeleccionada) {
-                productosResponse = await productoService.buscarPorCategoria(categoriaSeleccionada);
-            } else {
-                productosResponse = await productoService.obtenerTodos();
-            }
-
-            let productosFiltrados = productosResponse?.data || [];
-
-            // ✅ Filtros adicionales
-            if (tallaSeleccionada) {
-                productosFiltrados = productosFiltrados.filter(
-                    (p) => p.talla === tallaSeleccionada
+                productosFiltrados = productosFiltrados.filter(p =>
+                    p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+                    p.descripcion?.toLowerCase().includes(busqueda.toLowerCase())
                 );
             }
 
+            // Filtrar por categoría
+            if (categoriaSeleccionada) {
+                productosFiltrados = productosFiltrados.filter(p =>
+                    p.categoriaNombre === categoriaSeleccionada
+                );
+            }
+
+            // Filtrar por talla
+            if (tallaSeleccionada) {
+                productosFiltrados = productosFiltrados.filter(p =>
+                    p.talla === tallaSeleccionada
+                );
+            }
+
+            // Filtrar por color
             if (colorSeleccionado) {
-                productosFiltrados = productosFiltrados.filter(
-                    (p) => p.color === colorSeleccionado
+                productosFiltrados = productosFiltrados.filter(p =>
+                    p.color === colorSeleccionado
                 );
             }
 
@@ -75,7 +94,7 @@ function ProductList() {
         } catch (error) {
             console.error('Error al filtrar productos:', error);
         }
-    }, [busqueda, categoriaSeleccionada, tallaSeleccionada, colorSeleccionado]);
+    }, [productosOriginales, busqueda, categoriaSeleccionada, tallaSeleccionada, colorSeleccionado]);
 
     // ✅ Se llaman los efectos con dependencias estables
     useEffect(() => {
@@ -121,8 +140,8 @@ function ProductList() {
                                 >
                                     <option value="">Todas las categorías</option>
                                     {categorias.map((categoria) => (
-                                        <option key={categoria} value={categoria}>
-                                            {categoria}
+                                        <option key={categoria.id} value={categoria.nombre}>
+                                            {categoria.nombre}
                                         </option>
                                     ))}
                                 </Form.Select>

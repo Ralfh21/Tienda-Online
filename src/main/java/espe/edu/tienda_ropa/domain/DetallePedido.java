@@ -1,8 +1,6 @@
-package espe.edu.tienda_ropa.model;
+package espe.edu.tienda_ropa.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-
 import java.math.BigDecimal;
 
 @Entity
@@ -13,35 +11,27 @@ public class DetallePedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pedido_id", nullable = false)
-    private Pedido pedido;
+    @Column(name = "pedido_id", nullable = false)
+    private Long pedidoId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "producto_id", nullable = false)
-    private Producto producto;
+    @Column(name = "producto_id", nullable = false)
+    private Long productoId;
 
-    @NotNull(message = "La cantidad es obligatoria")
-    @Min(value = 1, message = "La cantidad debe ser mayor a 0")
     @Column(nullable = false)
     private Integer cantidad;
 
-    @NotNull(message = "El precio unitario es obligatorio")
-    @DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor a 0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
 
-    @NotNull(message = "El subtotal es obligatorio")
-    @DecimalMin(value = "0.0", inclusive = false, message = "El subtotal debe ser mayor a 0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 
     // Constructores
     public DetallePedido() {}
 
-    public DetallePedido(Pedido pedido, Producto producto, Integer cantidad, BigDecimal precioUnitario) {
-        this.pedido = pedido;
-        this.producto = producto;
+    public DetallePedido(Long pedidoId, Long productoId, Integer cantidad, BigDecimal precioUnitario) {
+        this.pedidoId = pedidoId;
+        this.productoId = productoId;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
         this.subtotal = precioUnitario.multiply(BigDecimal.valueOf(cantidad));
@@ -56,20 +46,20 @@ public class DetallePedido {
         this.id = id;
     }
 
-    public Pedido getPedido() {
-        return pedido;
+    public Long getPedidoId() {
+        return pedidoId;
     }
 
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
+    public void setPedidoId(Long pedidoId) {
+        this.pedidoId = pedidoId;
     }
 
-    public Producto getProducto() {
-        return producto;
+    public Long getProductoId() {
+        return productoId;
     }
 
-    public void setProducto(Producto producto) {
-        this.producto = producto;
+    public void setProductoId(Long productoId) {
+        this.productoId = productoId;
     }
 
     public Integer getCantidad() {
@@ -78,7 +68,7 @@ public class DetallePedido {
 
     public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
-        // Recalcular subtotal
+        // Recalcular subtotal cuando cambia la cantidad
         if (this.precioUnitario != null) {
             this.subtotal = this.precioUnitario.multiply(BigDecimal.valueOf(cantidad));
         }
@@ -90,7 +80,7 @@ public class DetallePedido {
 
     public void setPrecioUnitario(BigDecimal precioUnitario) {
         this.precioUnitario = precioUnitario;
-        // Recalcular subtotal
+        // Recalcular subtotal cuando cambia el precio
         if (this.cantidad != null) {
             this.subtotal = precioUnitario.multiply(BigDecimal.valueOf(this.cantidad));
         }

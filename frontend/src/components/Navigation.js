@@ -44,18 +44,20 @@ function Navigation() {
           <Nav className="ms-auto align-items-center">
             {/* Carrito solo para clientes autenticados */}
             {user && isCliente() && (
-              <Nav.Link href="#" className="position-relative me-3">
-                🛒 Carrito
-                {itemCount > 0 && (
-                  <Badge
-                    bg="danger"
-                    className="position-absolute top-0 start-100 translate-middle"
-                    style={{ fontSize: '0.7em' }}
-                  >
-                    {itemCount}
-                  </Badge>
-                )}
-              </Nav.Link>
+              <LinkContainer to="/carrito">
+                <Nav.Link className="position-relative me-3">
+                  🛒 Carrito
+                  {itemCount > 0 && (
+                    <Badge
+                      bg="danger"
+                      className="position-absolute top-0 start-100 translate-middle"
+                      style={{ fontSize: '0.7em' }}
+                    >
+                      {itemCount}
+                    </Badge>
+                  )}
+                </Nav.Link>
+              </LinkContainer>
             )}
 
             {/* Mostrar login o usuario */}

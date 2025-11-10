@@ -4,46 +4,43 @@
 USE tienda_ropa;
 
 -- =====================================================
--- 1. INSERTAR ROLES
+-- 1. LIMPIAR DATOS PREVIOS (opcional)
 -- =====================================================
-INSERT INTO roles (nombre) VALUES ('ROLE_ADMIN');
-INSERT INTO roles (nombre) VALUES ('ROLE_USER');
-
--- =====================================================
--- 2. INSERTAR USUARIOS
--- =====================================================
--- Contraseña para todos: "password123" (debe ser codificada por BCrypt)
--- Nota: Estos son ejemplos, Spring Boot los codificará al registrar
-
--- Usuario Administrador
--- Email: admin@tiendaropa.com
--- Password: admin123
-INSERT INTO usuarios (email, password, nombre) VALUES
-('admin@tiendaropa.com', '$2a$10$XvN5xYqGvwH.3K0bGk8tHOKhQx6lYK0Z8uYYqYj9qYj9qYj9qYj9q', 'Administrador Principal');
-
--- Usuarios Clientes
--- Email: maria.garcia@email.com, Password: password123
-INSERT INTO usuarios (email, password, nombre) VALUES
-('maria.garcia@email.com', '$2a$10$XvN5xYqGvwH.3K0bGk8tHOKhQx6lYK0Z8uYYqYj9qYj9qYj9qYj9q', 'María García');
-
--- Email: carlos.lopez@email.com, Password: password123
-INSERT INTO usuarios (email, password, nombre) VALUES
-('carlos.lopez@email.com', '$2a$10$XvN5xYqGvwH.3K0bGk8tHOKhQx6lYK0Z8uYYqYj9qYj9qYj9qYj9q', 'Carlos López');
-
--- Email: ana.martinez@email.com, Password: password123
-INSERT INTO usuarios (email, password, nombre) VALUES
-('ana.martinez@email.com', '$2a$10$XvN5xYqGvwH.3K0bGk8tHOKhQx6lYK0Z8uYYqYj9qYj9qYj9qYj9q', 'Ana Martínez');
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE detalle_pedido;
+TRUNCATE TABLE pedidos;
+TRUNCATE TABLE usuario_roles;
+DELETE FROM clientes WHERE usuario_id IS NOT NULL;
+TRUNCATE TABLE usuarios;
+TRUNCATE TABLE roles;
+TRUNCATE TABLE productos;
+TRUNCATE TABLE categorias;
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- =====================================================
--- 3. ASIGNAR ROLES A USUARIOS
+-- 2. INSERTAR ROLES
 -- =====================================================
--- Asignar ROLE_ADMIN al administrador (usuario_id = 1, rol_id = 1)
-INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (1, 1);
+INSERT INTO roles (id, nombre) VALUES (1, 'ROLE_ADMIN');
+INSERT INTO roles (id, nombre) VALUES (2, 'ROLE_USER');
 
--- Asignar ROLE_USER a los clientes (usuarios 2, 3, 4 con rol_id = 2)
-INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (2, 2);
-INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (3, 2);
-INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (4, 2);
+-- =====================================================
+-- 3. NOTA SOBRE USUARIOS
+-- =====================================================
+-- ⚠️ NO CREAR USUARIOS AQUÍ
+-- Los usuarios DEBEN ser creados usando el endpoint /api/auth/register
+-- para garantizar que las contraseñas se encripten correctamente con BCrypt
+--
+-- Después de iniciar el backend, ejecuta: registrar_usuarios.bat
+-- O usa el endpoint manualmente:
+--
+-- POST http://localhost:8080/api/auth/register
+-- {
+--   "nombre": "Administrador",
+--   "email": "admin@tiendaropa.com",
+--   "password": "admin123",
+--   "rol": "ROLE_ADMIN"
+-- }
+-- =====================================================
 
 -- =====================================================
 -- 4. INSERTAR CATEGORÍAS
@@ -56,24 +53,19 @@ INSERT INTO categorias (nombre, descripcion, activa) VALUES
 ('Accesorios', 'Complementos y accesorios de moda', true);
 
 -- =====================================================
--- 5. INSERTAR CLIENTES (asociados a usuarios)
+-- 5. NOTA SOBRE CLIENTES
 -- =====================================================
--- Cliente asociado al usuario 2 (María García)
-INSERT INTO clientes (nombre, apellido, email, telefono, direccion, ciudad, codigo_postal, fecha_registro, activo, usuario_id) VALUES
-('María', 'García', 'maria.garcia@email.com', '0991234567', 'Av. Amazonas 123', 'Quito', '170101', NOW(), true, 2);
-
--- Cliente asociado al usuario 3 (Carlos López)
-INSERT INTO clientes (nombre, apellido, email, telefono, direccion, ciudad, codigo_postal, fecha_registro, activo, usuario_id) VALUES
-('Carlos', 'López', 'carlos.lopez@email.com', '0987654321', 'Calle 10 de Agosto 456', 'Quito', '170102', NOW(), true, 3);
-
--- Cliente asociado al usuario 4 (Ana Martínez)
-INSERT INTO clientes (nombre, apellido, email, telefono, direccion, ciudad, codigo_postal, fecha_registro, activo, usuario_id) VALUES
-('Ana', 'Martínez', 'ana.martinez@email.com', '0976543210', 'Av. 6 de Diciembre 789', 'Quito', '170103', NOW(), true, 4);
-
--- Clientes sin usuario asociado (para compatibilidad)
-INSERT INTO clientes (nombre, apellido, email, telefono, direccion, ciudad, codigo_postal, fecha_registro, activo) VALUES
-('Juan', 'Rodríguez', 'juan.rodriguez@email.com', '0965432109', 'Calle Sucre 321', 'Guayaquil', '090101', NOW(), true),
-('Sofía', 'González', 'sofia.gonzalez@email.com', '0954321098', 'Av. 9 de Octubre 654', 'Guayaquil', '090102', NOW(), true);
+-- Los clientes se crean automáticamente cuando un usuario con rol ROLE_USER
+-- se registra usando el endpoint /api/auth/register
+--
+-- Al registrar un usuario con ROLE_USER, el sistema automáticamente:
+-- 1. Crea el usuario en la tabla 'usuarios'
+-- 2. Crea un cliente asociado en la tabla 'clientes'
+-- 3. Vincula el cliente con el usuario mediante 'usuario_id'
+--
+-- Los administradores (ROLE_ADMIN) NO tienen cliente asociado
+-- porque no realizan compras
+-- =====================================================
 
 -- =====================================================
 -- 6. INSERTAR PRODUCTOS
@@ -98,18 +90,42 @@ INSERT INTO productos (nombre, descripcion, precio, categoria_id, talla, color, 
 -- =====================================================
 -- INFORMACIÓN DE ACCESO
 -- =====================================================
--- Administrador:
---   Email: admin@tiendaropa.com
+--
+-- 🔧 ADMINISTRADOR (puede hacer CRUD de productos):
+--   Email:    admin@tiendaropa.com
 --   Password: admin123
+--   Rol:      ROLE_ADMIN
+--   Permisos: - Gestionar productos (crear, editar, eliminar)
+--             - Acceso al panel de administración
+--             - NO tiene carrito de compras
 --
--- Clientes:
---   Email: maria.garcia@email.com
---   Password: password123
+-- 👥 CLIENTES (pueden comprar y gestionar carrito):
 --
---   Email: carlos.lopez@email.com
---   Password: password123
+--   Email:    cliente@tiendaropa.com
+--   Password: cliente123
+--   Rol:      ROLE_USER
+--   Permisos: - Ver productos
+--             - Agregar al carrito
+--             - Realizar compras
+--             - NO puede modificar productos
 --
---   Email: ana.martinez@email.com
+--   Email:    maria.garcia@email.com
 --   Password: password123
+--   Rol:      ROLE_USER
+--
+--   Email:    carlos.lopez@email.com
+--   Password: password123
+--   Rol:      ROLE_USER
+--
+--   Email:    ana.martinez@email.com
+--   Password: password123
+--   Rol:      ROLE_USER
+--
+-- =====================================================
+-- INSTRUCCIONES:
+-- 1. Ejecuta este script DESPUÉS de iniciar Spring Boot
+-- 2. Inicia sesión en http://localhost:3000/login
+-- 3. Como admin: podrás ver el menú "Admin Panel"
+-- 4. Como cliente: podrás ver el carrito 🛒
 -- =====================================================
 

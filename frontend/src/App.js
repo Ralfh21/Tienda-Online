@@ -8,6 +8,7 @@ import ProductList from './pages/ProductList';
 import ProductDetail from './pages/ProductDetail';
 import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
+import Cart from './pages/Cart';
 import Footer from './components/Footer';
 import './App.css';
 
@@ -31,20 +32,21 @@ function AppContent() {
         <div className="App">
             <Navigation />
             <main className="container-fluid py-4">
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/productos" element={<ProductList />} />
-                    <Route path="/producto/:id" element={<ProductDetail />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route
-                        path="/admin"
-                        element={
-                            <ProtectedAdminRoute>
-                                <AdminPanel />
-                            </ProtectedAdminRoute>
-                        }
-                    />
-                </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/productos" element={<ProductList />} />
+          <Route path="/producto/:id" element={<ProductDetail />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/carrito" element={<Cart />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedAdminRoute>
+                <AdminPanel />
+              </ProtectedAdminRoute>
+            }
+          />
+        </Routes>
             </main>
             <Footer />
         </div>

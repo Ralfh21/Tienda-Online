@@ -11,15 +11,55 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
+  // Función para obtener el ID del usuario actual
+  const getCurrentUserId = () => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      const userData = JSON.parse(user);
+      return userData.userId || userData.clienteId || 'guest';
+    }
+    return 'guest';
+  };
+
+  const [currentUserId, setCurrentUserId] = useState(getCurrentUserId());
+
   const [items, setItems] = useState(() => {
-    // Cargar carrito desde localStorage al inicializar
-    const savedCart = localStorage.getItem('carrito');
+    // Cargar carrito específico del usuario desde localStorage
+    const userId = getCurrentUserId();
+    const savedCart = localStorage.getItem(`carrito_${userId}`);
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  // Verificar cambios en el usuario y resetear carrito si cambió
+  useEffect(() => {
+    const checkUserChange = () => {
+      const newUserId = getCurrentUserId();
+      if (newUserId !== currentUserId) {
+        setCurrentUserId(newUserId);
+        // Cargar carrito del nuevo usuario
+        const savedCart = localStorage.getItem(`carrito_${newUserId}`);
+        setItems(savedCart ? JSON.parse(savedCart) : []);
+      }
+    };
+
+    // Verificar cada segundo si cambió el usuario
+    const interval = setInterval(checkUserChange, 1000);
+
+    // También verificar inmediatamente
+    checkUserChange();
+
+    return () => clearInterval(interval);
+  }, [currentUserId]);
+
   // Guardar en localStorage cada vez que cambie el carrito
   useEffect(() => {
-    localStorage.setItem('carrito', JSON.stringify(items));
+    const userId = getCurrentUserId();
+    if (items.length > 0) {
+      localStorage.setItem(`carrito_${userId}`, JSON.stringify(items));
+    } else {
+      // Si el carrito está vacío, eliminar del localStorage
+      localStorage.removeItem(`carrito_${userId}`);
+    }
   }, [items]);
 
   const addToCart = (producto, cantidad = 1) => {

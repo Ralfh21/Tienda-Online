@@ -29,9 +29,19 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // 🔓 Rutas públicas
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/util/**").permitAll()
-                        .requestMatchers("/api/productos/**", "/api/categorias/**").permitAll()
+                        .requestMatchers("/api/productos/**").permitAll()
+                        .requestMatchers("/api/categorias/**").permitAll()
+
+                        // 🔓 AGREGADO: permitir crear pedidos
+                        .requestMatchers("/api/v2/pedidos/**").permitAll()
+
+                        // 🔓 AGREGADO: permitir crear detalles de pedidos
+                        .requestMatchers("/api/detalle-pedidos/**").permitAll()
+
+                        // Todo lo demás, requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

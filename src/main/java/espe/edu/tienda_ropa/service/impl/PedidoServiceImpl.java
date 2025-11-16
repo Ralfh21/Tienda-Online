@@ -1,9 +1,11 @@
 package espe.edu.tienda_ropa.service.impl;
 
 import espe.edu.tienda_ropa.domain.Pedido;
+import espe.edu.tienda_ropa.dto.DetallePedidoRequestData;
 import espe.edu.tienda_ropa.dto.PedidoRequestData;
 import espe.edu.tienda_ropa.dto.PedidoResponse;
 import espe.edu.tienda_ropa.repository.PedidoDomainRepository;
+import espe.edu.tienda_ropa.service.DetallePedidoService;
 import espe.edu.tienda_ropa.service.PedidoService;
 import espe.edu.tienda_ropa.web.advice.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -13,14 +15,19 @@ import java.util.List;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
-    private final PedidoDomainRepository repo;
 
-    public PedidoServiceImpl(PedidoDomainRepository repo) {
+    private final PedidoDomainRepository repo;
+    private final DetallePedidoService detalleService;
+
+    public PedidoServiceImpl(PedidoDomainRepository repo, DetallePedidoService detalleService) {
         this.repo = repo;
+        this.detalleService = detalleService;
     }
 
     @Override
     public PedidoResponse create(PedidoRequestData request) {
+
+        // Crear pedido principal
         Pedido pedido = new Pedido();
         pedido.setClienteId(request.getClienteId());
         pedido.setTotal(request.getTotal());
@@ -29,13 +36,24 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setFechaPedido(LocalDateTime.now());
         pedido.setEstado(Pedido.EstadoPedido.PENDIENTE);
 
+        // Guardar pedido
         Pedido saved = repo.save(pedido);
+
+        // Guardar detalles del pedido
+        if (request.getItems() != null) {
+            for (DetallePedidoRequestData item : request.getItems()) {
+                item.setPedidoId(saved.getId());
+                detalleService.create(item);
+            }
+        }
+
         return toResponse(saved);
     }
 
     @Override
     public PedidoResponse getById(Long id) {
-        Pedido pedido = repo.findById(id).orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
+        Pedido pedido = repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
         return toResponse(pedido);
     }
 
@@ -46,7 +64,9 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public PedidoResponse cancel(Long id) {
-        Pedido pedido = repo.findById(id).orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
+        Pedido pedido = repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Pedido no encontrado"));
+
         pedido.setEstado(Pedido.EstadoPedido.CANCELADO);
         return toResponse(repo.save(pedido));
     }

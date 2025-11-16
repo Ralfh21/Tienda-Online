@@ -10,6 +10,7 @@ import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import Cart from './pages/Cart';
 import Footer from './components/Footer';
+import ConfirmacionPedido from "./pages/ConfirmacionPedido";
 import './App.css';
 
 // 🔒 Componente para proteger rutas de admin
@@ -38,7 +39,9 @@ function AppContent() {
           <Route path="/producto/:id" element={<ProductDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/carrito" element={<Cart />} />
-          <Route
+          <Route path="/confirmacion/:id" element={<ConfirmacionPedido />} />
+
+            <Route
             path="/admin"
             element={
               <ProtectedAdminRoute>

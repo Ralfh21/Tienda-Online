@@ -103,21 +103,23 @@ function ProductList() {
         <Container fluid className="product-list-container py-5">
             {/* CATEGORÍAS */}
             {categorias.length > 0 && (
-                <div className="categories-section mb-5 text-center">
-                    <h2 className="fw-bold mb-4">Categorías</h2>
-                    <div className="d-flex flex-wrap justify-content-center gap-3">
-                        {categorias.map((categoria) => (
-                            <Button
-                                key={categoria.id}
-                                variant="outline-dark"
-                                className="rounded-pill px-4 py-2 category-btn"
-                                onClick={() => setCategoriaSeleccionada(categoria.nombre)}
-                            >
-                                {categoria.nombre}
-                            </Button>
-                        ))}
+                <center>
+                    <div className="categories-section mb-5 text-center">
+                        <h2 className="fw-bold mb-4">Categorías</h2>
+                        <div className="d-flex flex-wrap justify-content-center gap-3">
+                            {categorias.map((categoria) => (
+                                <Button
+                                    key={categoria.id}
+                                    variant="outline-dark"
+                                    className="rounded-pill px-4 py-2 category-btn"
+                                    onClick={() => setCategoriaSeleccionada(categoria.nombre)}
+                                >
+                                    {categoria.nombre}
+                                </Button>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                </center>
             )}
 
             <div className="shop-layout d-flex flex-wrap gap-4">
@@ -194,31 +196,37 @@ function ProductList() {
                 </Col>
 
                 {/* PRODUCTOS */}
-                <div className="products-area flex-grow-1">
-                    <h2 className="fw-bold mb-4 text-center text-md-start">
-                        Productos ({productos.length})
-                    </h2>
+                <center>
+                    <div className="products-area flex-grow-1">
+                        <h2 className="fw-bold mb-4 text-center text-md-start">
+                            Productos ({productos.length})
+                        </h2>
 
-                    {loading ? (
-                        <div className="text-center py-5">
-                            <div className="spinner-border text-dark" role="status">
-                                <span className="visually-hidden">Cargando...</span>
-                            </div>
-                        </div>
-                    ) : productos.length > 0 ? (
-                        <div className="products-grid d-flex flex-wrap justify-content-center gap-4">
-                            {productos.map((producto) => (
-                                <div key={producto.id} className="product-cell" style={{ maxWidth: '350px' }}>
-                                    <ProductCard producto={producto} />
+                        {loading ? (
+                            <div className="text-center py-5">
+                                <div className="spinner-border text-dark" role="status">
+                                    <span className="visually-hidden">Cargando...</span>
                                 </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center text-muted mt-4">
-                            <p>No se encontraron productos con los filtros seleccionados.</p>
-                        </div>
-                    )}
-                </div>
+                            </div>
+                        ) : productos.length > 0 ? (
+                            <center>
+                                <div className="products-grid d-flex flex-wrap justify-content-center gap-4">
+                                    {productos.map((producto) => (
+                                        <div key={producto.id} className="product-cell" style={{ maxWidth: '350px' }}>
+                                            <ProductCard producto={producto} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </center>
+                        ) : (
+
+
+                            <div className="text-center text-muted mt-4">
+                                <p>No se encontraron productos con los filtros seleccionados.</p>
+                            </div>
+                        )}
+                    </div>
+                </center>
             </div>
         </Container>
     );

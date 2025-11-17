@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container, Row, Col, Card, Button, Table, Alert } from "react-bootstrap";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -11,7 +11,10 @@ const Cart = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    // 🔥 FUNCIÓN COMPLETA PARA PAGAR
+    const [alertMsg, setAlertMsg] = useState(null);
+    const [pagoExitoso, setPagoExitoso] = useState(false);
+
+    // Función para procesar pago
     const handleCheckout = async () => {
         try {
             const itemsForBackend = items.map(item => ({
@@ -31,12 +34,25 @@ const Cart = () => {
             const response = await pedidoService.crear(pedido);
 
             clearCart();
-            navigate(`/confirmacion/${response.data.id}`);
+            setPagoExitoso(true); // mostrar mensaje de pago exitoso
+
+            // Redirigir después de 2.5 segundos
+            setTimeout(() => {
+                navigate(`/confirmacion/${response.data.id}`);
+            }, 2500);
 
         } catch (error) {
-            console.error("Error al crear pedido:", error);
-            alert("No se pudo procesar el pedido");
+            setAlertMsg({ text: "No se pudo procesar el pedido", variant: "danger" });
         }
+    };
+
+    // Función para eliminar un producto del carrito
+    const handleRemove = (id) => {
+        removeFromCart(id);
+        setAlertMsg({
+            text: "Se ha eliminado este producto del carrito, ¡esperamos que encuentre algo que le guste!",
+            variant: "danger"
+        });
     };
 
     if (!user) {
@@ -71,7 +87,24 @@ const Cart = () => {
     }
 
     return (
-        <Container className="mt-4 cart-page-container">
+        <Container className="mt-4">
+            {/* Alertas */}
+            {alertMsg && (
+                <Alert
+                    variant={alertMsg.variant}
+                    onClose={() => setAlertMsg(null)}
+                    dismissible
+                >
+                    {alertMsg.text}
+                </Alert>
+            )}
+
+            {pagoExitoso && (
+                <Alert variant="success" className="text-center">
+                    Pago realizado con éxito. ¡Gracias por su compra!
+                </Alert>
+            )}
+
             <Row>
                 <Col>
                     <h2 className="mb-4">🛒 Mi Carrito de Compras</h2>
@@ -121,9 +154,7 @@ const Cart = () => {
                                                 >
                                                     -
                                                 </Button>
-
                                                 <span className="mx-3">{item.cantidad}</span>
-
                                                 <Button
                                                     variant="outline-secondary"
                                                     size="sm"
@@ -140,7 +171,11 @@ const Cart = () => {
                                         </td>
 
                                         <td className="align-middle">
-                                            <Button variant="danger" size="sm" onClick={() => removeFromCart(item.id)}>
+                                            <Button
+                                                variant="danger"
+                                                size="sm"
+                                                onClick={() => handleRemove(item.id)}
+                                            >
                                                 🗑️ Eliminar
                                             </Button>
                                         </td>
@@ -155,7 +190,6 @@ const Cart = () => {
                                         <Button variant="outline-danger" onClick={clearCart} className="me-2">
                                             Vaciar Carrito
                                         </Button>
-
                                         <Button variant="outline-primary" onClick={() => navigate("/productos")}>
                                             Seguir Comprando
                                         </Button>
@@ -166,27 +200,21 @@ const Cart = () => {
                                             <Card.Body>
                                                 <h5>Resumen del Pedido</h5>
                                                 <hr />
-
                                                 <div className="d-flex justify-content-between mb-2">
                                                     <span>Subtotal:</span>
                                                     <strong>${getTotal().toFixed(2)}</strong>
                                                 </div>
-
                                                 <div className="d-flex justify-content-between mb-2">
                                                     <span>IVA (12%):</span>
                                                     <strong>${(getTotal() * 0.12).toFixed(2)}</strong>
                                                 </div>
-
                                                 <hr />
-
                                                 <div className="d-flex justify-content-between mb-3">
                                                     <h5>Total:</h5>
                                                     <h5 className="text-primary">
                                                         ${(getTotal() * 1.12).toFixed(2)}
                                                     </h5>
                                                 </div>
-
-                                                {/* 🔥 BOTÓN CORREGIDO */}
                                                 <Button
                                                     variant="success"
                                                     size="lg"

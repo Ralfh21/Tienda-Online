@@ -9,13 +9,15 @@ function ProductList() {
     const [productosOriginales, setProductosOriginales] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [tallas, setTallas] = useState([]);
-    const [colores, setColores] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const [busqueda, setBusqueda] = useState('');
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
     const [tallaSeleccionada, setTallaSeleccionada] = useState('');
     const [colorSeleccionado, setColorSeleccionado] = useState('');
+
+    // Colores fijos para el filtro
+    const coloresDisponibles = ["Blanco","Negro","Rojo","Azul","Verde","Amarillo","Naranja","Morado","Rosa","Gris","Marrón"];
 
     const cargarDatos = useCallback(async () => {
         try {
@@ -33,9 +35,7 @@ function ProductList() {
             setCategorias(categoriasData);
 
             const tallasUnicas = [...new Set(productosData.map((p) => p.talla).filter(Boolean))];
-            const coloresUnicos = [...new Set(productosData.map((p) => p.color).filter(Boolean))];
             setTallas(tallasUnicas);
-            setColores(coloresUnicos);
         } catch (error) {
             console.error('Error al cargar productos:', error);
         } finally {
@@ -47,11 +47,15 @@ function ProductList() {
         let productosFiltrados = [...productosOriginales];
 
         if (busqueda) {
-            productosFiltrados = productosFiltrados.filter(
-                (p) =>
-                    p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-                    p.descripcion?.toLowerCase().includes(busqueda.toLowerCase())
-            );
+            const nombreRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]*$/;
+            if (nombreRegex.test(busqueda)) {
+                productosFiltrados = productosFiltrados.filter(
+                    (p) =>
+                        p.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+                        p.descripcion?.toLowerCase().includes(busqueda.toLowerCase())
+                );
+            }
+            // Si no coincide con regex, no filtra y mantiene los productos previos
         }
 
         if (categoriaSeleccionada) {
@@ -84,6 +88,15 @@ function ProductList() {
         setCategoriaSeleccionada('');
         setTallaSeleccionada('');
         setColorSeleccionado('');
+    };
+
+    // Función que evita escribir números en el input de búsqueda
+    const handleBusquedaChange = (e) => {
+        const valor = e.target.value;
+        const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]*$/;
+        if (soloLetras.test(valor)) {
+            setBusqueda(valor);
+        }
     };
 
     return (
@@ -120,7 +133,7 @@ function ProductList() {
                                     type="text"
                                     placeholder="Nombre del producto..."
                                     value={busqueda}
-                                    onChange={(e) => setBusqueda(e.target.value)}
+                                    onChange={handleBusquedaChange}
                                 />
                             </Form.Group>
 
@@ -161,7 +174,7 @@ function ProductList() {
                                     onChange={(e) => setColorSeleccionado(e.target.value)}
                                 >
                                     <option value="">Todos los colores</option>
-                                    {colores.map((color) => (
+                                    {coloresDisponibles.map((color) => (
                                         <option key={color} value={color}>
                                             {color}
                                         </option>

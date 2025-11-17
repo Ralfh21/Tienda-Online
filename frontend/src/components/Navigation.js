@@ -1,129 +1,88 @@
 import React, { useState, useEffect } from "react";
-import { Navbar, Nav, Container, Badge, NavDropdown } from "react-bootstrap";
+import { Navbar, Nav, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import { categoriaService } from "../services/api";
 
 function Navigation() {
+    const { user, logout, isAdmin } = useAuth();
     const { getItemCount } = useCart();
-    const { user, logout, isAdmin, isCliente } = useAuth();
-    const itemCount = getItemCount();
     const navigate = useNavigate();
-    const [categorias, setCategorias] = useState([]);
 
-    useEffect(() => {
-        const cargarCategorias = async () => {
-            try {
-                const response = await categoriaService.obtenerTodos();
-                const categoriasData = response?.data || [];
-
-                const categoriasUnicas = Array.from(
-                    new Map(categoriasData.map((cat) => [cat.nombre, cat])).values()
-                );
-
-                setCategorias(categoriasUnicas.slice(0, 6));
-            } catch (error) {
-                console.error("Error al cargar categorías:", error);
-            }
-        };
-
-        cargarCategorias();
-    }, []);
+    const itemCount = getItemCount();
 
     const handleLogout = () => {
         logout();
         navigate("/");
     };
 
-    const handleCategoriaClick = (nombreCategoria) => {
-        navigate(`/productos?categoria=${encodeURIComponent(nombreCategoria)}`);
-    };
-
     return (
-        <Navbar bg="light" variant="light" expand="lg" className="navbar">
+        <Navbar bg="light" className="shadow-sm px-4" expand="lg">
             <Container>
+
+                {/* Logo */}
                 <LinkContainer to="/">
-                    <Navbar.Brand>🛍️ StyleHub</Navbar.Brand>
+                    <Navbar.Brand className="fw-bold fs-4">
+                        🛍️ StyleHub
+                    </Navbar.Brand>
                 </LinkContainer>
 
-                <Navbar.Collapse id="basic-navbar-nav" className="items-menu-container">
-                    <Nav className="me-auto">
+                <Navbar.Toggle />
 
-                        <LinkContainer to="/">
-                            <Nav.Link>Inicio</Nav.Link>
-                        </LinkContainer>
+                <Navbar.Collapse className="justify-content-end">
 
-                        <LinkContainer to="/productos">
-                            <Nav.Link>Productos</Nav.Link>
-                        </LinkContainer>
+                    <Nav className="align-items-center">
 
-                        {/* 🔥 MENÚ DE CATEGORÍAS */}
-                        {categorias.length > 0 && (
-                            <NavDropdown title="Categorías" id="basic-nav-dropdown">
-                                {categorias.map((cat) => (
-                                    <NavDropdown.Item
-                                        key={cat.id}
-                                        onClick={() => handleCategoriaClick(cat.nombre)}
-                                    >
-                                        {cat.nombre}
-                                    </NavDropdown.Item>
-                                ))}
-                            </NavDropdown>
-                        )}
-
+                        {/* 🟣 ADMIN NAV — en una sola fila */}
                         {user && isAdmin() && (
-                            <LinkContainer to="/admin">
-                                <Nav.Link>Admin Panel</Nav.Link>
-                            </LinkContainer>
-                        )}
-                    </Nav>
+                            <>
+                                <span className="me-3 fw-semibold">👤 Administrador</span>
 
-                    <Nav className="ms-auto align-items-center">
+                                <LinkContainer to="/admin">
+                                    <Nav.Link className="me-3">Panel Admin</Nav.Link>
+                                </LinkContainer>
 
-                        {user && isCliente() && (
-                            <LinkContainer to="/carrito">
-                                <Nav.Link className="position-relative me-3">
-                                    🛒 Carrito
-                                    {itemCount > 0 && (
-                                        <Badge
-                                            bg="danger"
-                                            className="position-absolute top-0 start-100 translate-middle"
-                                            style={{ fontSize: "0.7em" }}
-                                        >
-                                            {itemCount}
-                                        </Badge>
-                                    )}
-                                </Nav.Link>
-                            </LinkContainer>
-                        )}
-
-                        {user ? (
-                            <NavDropdown
-                                title={`👤 ${user.nombre}`}
-                                id="user-nav-dropdown"
-                                align="end"
-                            >
-                                <NavDropdown.Item disabled>
-                                    <small className="text-muted">
-                                        {isAdmin() ? "🔧 Administrador" : "👥 Cliente"}
-                                    </small>
-                                </NavDropdown.Item>
-
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item onClick={handleLogout}>
+                                <Nav.Link
+                                    className="text-danger fw-semibold"
+                                    onClick={handleLogout}
+                                >
                                     🚪 Cerrar Sesión
-                                </NavDropdown.Item>
-                            </NavDropdown>
-                        ) : (
+                                </Nav.Link>
+                            </>
+                        )}
+
+                        {/* 🟡 USUARIO CLIENTE */}
+                        {user && !isAdmin() && (
+                            <>
+                                {/* Carrito */}
+                                <LinkContainer to="/carrito">
+                                    <Nav.Link className="me-3">
+                                        🛒 Carrito {itemCount > 0 && `(${itemCount})`}
+                                    </Nav.Link>
+                                </LinkContainer>
+
+                                <span className="me-3 fw-semibold">👤 {user.nombre}</span>
+
+                                <Nav.Link
+                                    className="text-danger fw-semibold"
+                                    onClick={handleLogout}
+                                >
+                                    🚪 Cerrar Sesión
+                                </Nav.Link>
+                            </>
+                        )}
+
+                        {/* 🟢 Visitante / No logueado */}
+                        {!user && (
                             <LinkContainer to="/login">
-                                <Nav.Link className="btn btn-outline-light btn-sm">
+                                <Nav.Link className="btn btn-outline-dark rounded-pill px-3">
                                     🔐 Iniciar Sesión
                                 </Nav.Link>
                             </LinkContainer>
                         )}
                     </Nav>
+
                 </Navbar.Collapse>
             </Container>
         </Navbar>

@@ -432,7 +432,8 @@ h6 { font-size: 1rem; }
     margin-bottom: 1.5rem;
 }
 
-form {
+/* Solo estilos del formulario que está dentro del Admin si algún día quieres */
+.admin-panel-form {
     background-color: var(--light-gray);
     padding: 2rem;
     border-radius: 12px;
@@ -440,6 +441,9 @@ form {
     margin: 0 auto 2rem auto;
     max-width: 700px;
 }
+
+
+
 
 form .form-label {
     font-weight: 500;
@@ -1119,5 +1123,15 @@ form button {
         gap: 16px;
     }
 }
+
+/* ====== FIX: EVITAR QUE EL FORM GLOBAL ROMPA EL MODAL ====== */
+.admin-modal-form {
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+}
+
 
 

@@ -1,3 +1,4 @@
+// src/pages/AdminPanel.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Button, Table, Form, Modal, Alert, Badge } from 'react-bootstrap';
 import { productoService, categoriaService } from '../services/api';
@@ -23,7 +24,6 @@ function AdminPanel() {
         imagenUrl: ''
     });
 
-    // ✅ Se usa useCallback para evitar el warning de dependencias en useEffect
     const cargarProductos = useCallback(async () => {
         try {
             setLoading(true);
@@ -31,40 +31,37 @@ function AdminPanel() {
                 productoService.obtenerTodos(),
                 categoriaService.obtenerTodos()
             ]);
+
             setProductos(productosResponse?.data || []);
 
-            // ✅ Eliminar categorías duplicadas por nombre
             const categoriasList = categoriasResponse?.data || [];
             const categoriasUnicas = Array.from(
-                new Map(categoriasList.map((cat) => [cat.nombre, cat])).values()
+                new Map(categoriasList.map(cat => [cat.nombre, cat])).values()
             );
+
             setCategorias(categoriasUnicas);
         } catch (error) {
-            console.error('Error al cargar datos:', error);
             mostrarAlerta('Error al cargar datos', 'danger');
         } finally {
             setLoading(false);
         }
-    }, []); // ✅ sin dependencias porque no depende de props ni estado externo
+    }, []);
 
     useEffect(() => {
         cargarProductos();
-    }, [cargarProductos]); // ✅ ahora ESLint no genera advertencias
+    }, [cargarProductos]);
 
     const mostrarAlerta = (message, variant = 'success') => {
         setAlert({ show: true, message, variant });
-        setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 3000);
+        setTimeout(() => setAlert({ show: false, message: '', variant: '' }), 2500);
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = e => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async e => {
         e.preventDefault();
         try {
             if (editingProduct) {
@@ -74,11 +71,9 @@ function AdminPanel() {
                 await productoService.crear(formData);
                 mostrarAlerta('Producto creado correctamente');
             }
-            setShowModal(false);
-            resetForm();
+            handleCloseModal();
             cargarProductos();
-        } catch (error) {
-            console.error('Error al guardar producto:', error);
+        } catch {
             mostrarAlerta('Error al guardar producto', 'danger');
         }
     };
@@ -99,32 +94,22 @@ function AdminPanel() {
     };
 
     const handleDeactivate = async (id) => {
-        if (window.confirm('¿Estás seguro de que quieres desactivar este producto? (Stock se pondrá en 0)')) {
-            try {
-                await productoService.desactivar(id);
-                mostrarAlerta('Producto desactivado correctamente');
-                cargarProductos();
-            } catch (error) {
-                console.error('Error al desactivar producto:', error);
-                mostrarAlerta('Error al desactivar producto', 'danger');
-            }
-        }
+        if (!window.confirm("¿Deseas desactivar este producto?")) return;
+        await productoService.desactivar(id);
+        mostrarAlerta("Producto desactivado");
+        cargarProductos();
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('⚠️ ¿Estás seguro de que quieres ELIMINAR PERMANENTEMENTE este producto? Esta acción NO se puede deshacer.')) {
-            try {
-                await productoService.eliminar(id);
-                mostrarAlerta('Producto eliminado permanentemente', 'success');
-                cargarProductos();
-            } catch (error) {
-                console.error('Error al eliminar producto:', error);
-                mostrarAlerta('Error al eliminar producto', 'danger');
-            }
-        }
+        if (!window.confirm("¿Eliminar producto permanentemente?")) return;
+        await productoService.eliminar(id);
+        mostrarAlerta("Producto eliminado");
+        cargarProductos();
     };
 
-    const resetForm = () => {
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setEditingProduct(null);
         setFormData({
             nombre: '',
             descripcion: '',
@@ -135,276 +120,180 @@ function AdminPanel() {
             stock: '',
             imagenUrl: ''
         });
-        setEditingProduct(null);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-        resetForm();
     };
 
     return (
-        <Container>
-            <Row>
-                <Col>
-                    {/* Banner de bienvenida para administrador */}
-                    <Alert variant="info" className="mb-4 d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 className="mb-1">
-                                🔧 Bienvenido, {user?.nombre}
-                                <Badge bg="danger" className="ms-2">Administrador</Badge>
-                            </h5>
-                            <small>Aquí puedes gestionar todos los productos de la tienda</small>
+        <Container className="py-4 admin-panel-container">
+
+            <Alert variant="light" className="shadow-sm p-4 border rounded-4 admin-header">
+                <h4 className="fw-bold mb-0">
+                    🔧 Bienvenido, {user?.nombre}
+                    <Badge bg="dark" className="ms-2">ADMIN</Badge>
+                </h4>
+                <p className="mt-2 mb-0 text-muted">
+                    Gestiona productos y categorías de tu tienda.
+                </p>
+            </Alert>
+
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2 className="fw-bold">Panel de Administración</h2>
+                <Button variant="primary" onClick={() => setShowModal(true)}>
+                    + Agregar producto
+                </Button>
+            </div>
+
+            {alert.show && (
+                <Alert variant={alert.variant} className="rounded-3 shadow-sm">
+                    {alert.message}
+                </Alert>
+            )}
+
+            {/* Listado */}
+            <Card className="shadow-sm border-0 rounded-4">
+                <Card.Body>
+                    <h5 className="fw-bold">Productos Registrados ({productos.length})</h5>
+
+                    {loading ? (
+                        <div className="text-center py-4">
+                            <div className="spinner-border text-warning"></div>
                         </div>
-                    </Alert>
+                    ) : (
+                        <div className="table-responsive mt-3">
+                            <Table hover className="align-middle">
+                                <thead className="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Categoría</th>
+                                    <th>Talla</th>
+                                    <th>Color</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
+                                </tr>
+                                </thead>
 
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Panel de Administración</h2>
-                        <Button variant="primary" onClick={() => setShowModal(true)}>
-                            Agregar Producto
-                        </Button>
-                    </div>
-
-                    {alert.show && (
-                        <Alert variant={alert.variant} className="mb-4">
-                            {alert.message}
-                        </Alert>
-                    )}
-
-                    {/* CATEGORÍAS */}
-                    {categorias.length > 0 && (
-                        <div className="categories-section mb-4 text-center">
-                            <h4 className="fw-bold mb-3">Categorías</h4>
-                            <div className="d-flex flex-wrap justify-content-center gap-3">
-                                {categorias.map((categoria) => (
-                                    <Button
-                                        key={categoria.id}
-                                        variant="outline-dark"
-                                        className="rounded-pill px-4 py-2"
-                                    >
-                                        {categoria.nombre}
-                                    </Button>
+                                <tbody>
+                                {productos.map(producto => (
+                                    <tr key={producto.id}>
+                                        <td>{producto.id}</td>
+                                        <td>{producto.nombre}</td>
+                                        <td>${producto.precio}</td>
+                                        <td>{producto.categoriaNombre}</td>
+                                        <td>{producto.talla}</td>
+                                        <td>{producto.color}</td>
+                                        <td>{producto.stock}</td>
+                                        <td className="text-nowrap">
+                                            <Button size="sm" variant="outline-primary" className="me-2" onClick={() => handleEdit(producto)}>Editar</Button>
+                                            <Button size="sm" variant="outline-warning" className="me-2" onClick={() => handleDeactivate(producto.id)}>Desactivar</Button>
+                                            <Button size="sm" variant="outline-danger" onClick={() => handleDelete(producto.id)}>Eliminar</Button>
+                                        </td>
+                                    </tr>
                                 ))}
-                            </div>
+                                </tbody>
+
+                            </Table>
                         </div>
                     )}
 
-                    <Card>
-                        <Card.Body>
-                            <h5>Productos ({productos.length})</h5>
+                </Card.Body>
+            </Card>
 
-                            {loading ? (
-                                <div className="text-center">
-                                    <div className="spinner-border text-primary" role="status">
-                                        <span className="visually-hidden">Cargando...</span>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="table-responsive">
-                                    <Table striped bordered hover>
-                                        <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Nombre</th>
-                                            <th>Precio</th>
-                                            <th>Categoría</th>
-                                            <th>Talla</th>
-                                            <th>Color</th>
-                                            <th>Stock</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {productos.map(producto => (
-                                            <tr key={producto.id}>
-                                                <td>{producto.id}</td>
-                                                <td>{producto.nombre}</td>
-                                                <td>${producto.precio}</td>
-                                                <td>{producto.categoriaNombre}</td>
-                                                <td>{producto.talla}</td>
-                                                <td>{producto.color}</td>
-                                                <td>{producto.stock}</td>
-                                                <td>
-                                                    <Button
-                                                        variant="outline-primary"
-                                                        size="sm"
-                                                        className="me-1"
-                                                        onClick={() => handleEdit(producto)}
-                                                    >
-                                                        Editar
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline-warning"
-                                                        size="sm"
-                                                        className="me-1"
-                                                        onClick={() => handleDeactivate(producto.id)}
-                                                    >
-                                                        Desactivar
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(producto.id)}
-                                                    >
-                                                        Eliminar
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </Table>
-                                </div>
-                            )}
-
-                            {productos.length === 0 && !loading && (
-                                <div className="text-center text-muted">
-                                    <p>No hay productos registrados</p>
-                                </div>
-                            )}
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-
-            {/* Modal para agregar/editar producto */}
-            <Modal show={showModal} onHide={handleCloseModal} size="lg">
+            {/* Modal */}
+            <Modal
+                show={showModal}
+                onHide={handleCloseModal}
+                size="lg"
+                centered
+                backdrop="static"
+            >
                 <Modal.Header closeButton>
-                    <Modal.Title>
-                        {editingProduct ? 'Editar Producto' : 'Agregar Nuevo Producto'}
+                    <Modal.Title className="fw-bold">
+                        {editingProduct ? "Editar Producto" : "Agregar Nuevo Producto"}
                     </Modal.Title>
                 </Modal.Header>
-                <Form onSubmit={handleSubmit}>
+
+                <Form className="admin-modal-form" onSubmit={handleSubmit}>
                     <Modal.Body>
+
                         <Row>
                             <Col md={6}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Nombre *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="nombre"
-                                        value={formData.nombre}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <Form.Control required name="nombre" value={formData.nombre} onChange={handleInputChange}/>
                                 </Form.Group>
                             </Col>
+
                             <Col md={6}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Precio *</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        step="0.01"
-                                        name="precio"
-                                        value={formData.precio}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <Form.Control type="number" step="0.01" required name="precio" value={formData.precio} onChange={handleInputChange}/>
                                 </Form.Group>
                             </Col>
                         </Row>
 
                         <Form.Group className="mb-3">
                             <Form.Label>Descripción</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={3}
-                                name="descripcion"
-                                value={formData.descripcion}
-                                onChange={handleInputChange}
-                            />
+                            <Form.Control as="textarea" rows={3} name="descripcion" value={formData.descripcion} onChange={handleInputChange}/>
                         </Form.Group>
 
                         <Row>
                             <Col md={4}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Categoría *</Form.Label>
-                                    <Form.Select
-                                        name="categoriaId"
-                                        value={formData.categoriaId}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="">Seleccionar categoría</option>
-                                        {categorias.map(categoria => (
-                                            <option key={categoria.id} value={categoria.id}>
-                                                {categoria.nombre}
-                                            </option>
+                                    <Form.Select required name="categoriaId" value={formData.categoriaId} onChange={handleInputChange}>
+                                        <option value="">Seleccionar</option>
+                                        {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+
+                            <Col md={4}>
+                                <Form.Group>
+                                    <Form.Label>Talla *</Form.Label>
+                                    <Form.Select required name="talla" value={formData.talla} onChange={handleInputChange}>
+                                        <option value="">Seleccionar</option>
+                                        {["XS","S","M","L","XL","XXL"].map(t => (
+                                            <option key={t} value={t}>{t}</option>
                                         ))}
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
+
                             <Col md={4}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Talla *</Form.Label>
-                                    <Form.Select
-                                        name="talla"
-                                        value={formData.talla}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="">Seleccionar talla</option>
-                                        <option value="XS">XS</option>
-                                        <option value="S">S</option>
-                                        <option value="M">M</option>
-                                        <option value="L">L</option>
-                                        <option value="XL">XL</option>
-                                        <option value="XXL">XXL</option>
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-                            <Col md={4}>
-                                <Form.Group className="mb-3">
+                                <Form.Group>
                                     <Form.Label>Color *</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="color"
-                                        value={formData.color}
-                                        onChange={handleInputChange}
-                                        required
-                                        placeholder="ej: Rojo, Azul, Negro"
-                                    />
+                                    <Form.Control required name="color" placeholder="Rojo, Azul, Negro..." value={formData.color} onChange={handleInputChange}/>
                                 </Form.Group>
                             </Col>
                         </Row>
 
-                        <Row>
+                        <Row className="mt-3">
                             <Col md={6}>
-                                <Form.Group className="mb-3">
+                                <Form.Group>
                                     <Form.Label>Stock *</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        name="stock"
-                                        value={formData.stock}
-                                        onChange={handleInputChange}
-                                        required
-                                        min="0"
-                                    />
+                                    <Form.Control required type="number" min="0" name="stock" value={formData.stock} onChange={handleInputChange}/>
                                 </Form.Group>
                             </Col>
+
                             <Col md={6}>
-                                <Form.Group className="mb-3">
+                                <Form.Group>
                                     <Form.Label>URL de Imagen</Form.Label>
-                                    <Form.Control
-                                        type="url"
-                                        name="imagenUrl"
-                                        value={formData.imagenUrl}
-                                        onChange={handleInputChange}
-                                        placeholder="https://ejemplo.com/imagen.jpg"
-                                    />
+                                    <Form.Control name="imagenUrl" value={formData.imagenUrl} onChange={handleInputChange}/>
                                 </Form.Group>
                             </Col>
                         </Row>
+
                     </Modal.Body>
+
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                            Cancelar
-                        </Button>
-                        <Button variant="primary" type="submit">
-                            {editingProduct ? 'Actualizar' : 'Crear'} Producto
-                        </Button>
+                        <Button variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
+                        <Button variant="primary" type="submit">{editingProduct ? "Actualizar" : "Crear"} Producto</Button>
                     </Modal.Footer>
                 </Form>
+
             </Modal>
+
         </Container>
     );
 }

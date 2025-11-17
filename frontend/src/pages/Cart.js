@@ -69,10 +69,12 @@ const Cart = () => {
         );
     }
 
+
     if (items.length === 0) {
         return (
             <Container className="mt-5 cart-page-container">
                 <Card className="text-center p-5">
+                    <center>
                     <Card.Body>
                         <div className="empty-cart-icon mb-4">🛒</div>
                         <h2>Tu carrito está vacío</h2>
@@ -81,6 +83,7 @@ const Cart = () => {
                             Ver Productos
                         </Button>
                     </Card.Body>
+                    </center>
                 </Card>
             </Container>
         );
@@ -105,6 +108,7 @@ const Cart = () => {
                 </Alert>
             )}
 
+            <center>
             <Row>
                 <Col>
                     <h2 className="mb-4">🛒 Mi Carrito de Compras</h2>
@@ -232,6 +236,7 @@ const Cart = () => {
                     </Card>
                 </Col>
             </Row>
+            </center>
         </Container>
     );
 };

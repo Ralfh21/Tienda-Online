@@ -182,11 +182,13 @@ function AdminPanel() {
     return (
         <Container className="py-4 admin-panel-container">
 
+            <center>
             <Alert variant="light" className="shadow-sm p-4 border rounded-4 admin-header text-center">
                 <h4 className="fw-bold mb-0">
                     Bienvenido, Administrador
                 </h4>
             </Alert>
+
 
             <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
                 <h2 className="fw-bold">Panel de Administración</h2>
@@ -196,6 +198,7 @@ function AdminPanel() {
                     </Button>
                 )}
             </div>
+                </center>
 
             {alert.show && (
                 <Alert variant={alert.variant} className="rounded-3 shadow-sm text-center">
@@ -203,6 +206,7 @@ function AdminPanel() {
                 </Alert>
             )}
 
+            <center>
             <Row className="justify-content-center">
                 <Col lg={8} md={10}>
                     <Card className="shadow-sm border-0 rounded-4">
@@ -378,6 +382,7 @@ function AdminPanel() {
                     </Card>
                 </Col>
             </Row>
+            </center>
 
             {/* Modal de confirmación de eliminación */}
             <Modal show={confirmDelete.show} onHide={closeConfirmDelete} centered>

@@ -25,6 +25,9 @@ public class PedidoIntegrationTest {
     private PedidoDomainRepository pedidoRepo;
 
     @Autowired
+    private ClienteDomainRepository clienteRepo;
+
+    @Autowired
     private PedidoService pedidoService;
 
     @Test
@@ -39,6 +42,15 @@ public class PedidoIntegrationTest {
         p.setStock(10);
         Producto saved = productoRepo.save(p);
 
+        // Crear cliente de prueba
+        Cliente c = new Cliente();
+        c.setNombre("Test");
+        c.setApellido("User");
+        c.setCorreo("test@example.com");
+        c.setTelefono("0999999999");
+        // agrega cualquier otro campo @NotNull
+        Cliente savedCliente = clienteRepo.save(c);
+
         // Preparar pedido con detalle
         DetallePedidoRequestData detalle = new DetallePedidoRequestData();
         detalle.setProductoId(saved.getId());
@@ -46,8 +58,8 @@ public class PedidoIntegrationTest {
         detalle.setPrecioUnitario(saved.getPrecio());
 
         PedidoRequestData pedidoReq = new PedidoRequestData();
-        pedidoReq.setClienteId(1L);
-        pedidoReq.setTotal(new BigDecimal("22.00")); // incluye IVA u otros
+        pedidoReq.setClienteId(savedCliente.getId());
+        pedidoReq.setTotal(new BigDecimal("22.00"));
         pedidoReq.setDireccionEnvio("Calle Test 123");
         pedidoReq.setObservaciones("");
         pedidoReq.setItems(List.of(detalle));
@@ -71,4 +83,3 @@ public class PedidoIntegrationTest {
         assertEquals(8, prodAfter.getStock());
     }
 }
-

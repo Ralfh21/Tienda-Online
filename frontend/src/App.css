@@ -468,10 +468,12 @@ form button {
 /* ===== FOOTER MEJORADO ===== */
 .footer {
     background: linear-gradient(135deg, var(--black) 0%, #1a1a1a 100%);
-    width: 100%;
-    padding-top: 3rem;
-    padding-bottom: 2rem;
 }
+
+.footer a:hover::after {
+    width: 100%;
+}
+
 
 
 .footer::before {
@@ -556,6 +558,99 @@ form button {
     text-align: center;
     color: #888;
 }
+
+
+.contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: rem;
+}
+
+.contact-row span,
+.contact-row a {
+    color: #ccc;
+    font-size: 0.95rem;
+}
+
+.contact-row a {
+    color: var(--gold);
+    text-decoration: none;
+}
+
+.separator {
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .contact-row {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.3rem;
+    }
+
+    .separator {
+        display: none;
+    }
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin-top: 1rem;
+    align-items: center;
+}
+
+.contact-grid .item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem; /* Reduce espacio entre etiqueta y contenido */
+}
+
+.contact-grid .center {
+    justify-content: center;
+}
+
+.contact-grid .right {
+    justify-content: flex-end;
+    padding-right: 10px; /* Evita que quede pegado al filo */
+}
+
+/* Estilos de texto */
+.contact-grid .label {
+    font-weight: 500;
+    color: var(--gold);
+}
+
+.contact-grid a,
+.contact-grid span {
+    color: #ccc;
+    font-size: 0.95rem;
+}
+
+/* Versión móvil */
+@media (max-width: 768px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .contact-grid .item,
+    .contact-grid .center,
+    .contact-grid .right {
+        justify-content: center !important;
+        padding-right: 0;
+    }
+}
+
+
+
+
+
+
 
 /* ====== RESPONSIVE MEJORADO ====== */
 @media (max-width: 1200px) {

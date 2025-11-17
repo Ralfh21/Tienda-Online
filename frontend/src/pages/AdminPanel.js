@@ -187,7 +187,7 @@ function AdminPanel() {
                 </Alert>
             )}
 
-            <Row className="justify-content-center">
+            <Row>
                 {showForm ? (
                     <Col lg={8} md={10} className="mb-4">
                         <Card className="shadow-sm border-0 rounded-4">
@@ -270,7 +270,7 @@ function AdminPanel() {
                         </Card>
                     </Col>
                 ) : (
-                <Col lg={12}>
+                <Col lg={10} style={{ margin: '0 auto', float: 'none' }}>
                     {/* Listado */}
                     <Card className="shadow-sm border-0 rounded-4">
                         <Card.Body>

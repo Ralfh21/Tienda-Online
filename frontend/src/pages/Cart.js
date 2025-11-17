@@ -55,7 +55,7 @@ const Cart = () => {
 
     if (items.length === 0) {
         return (
-            <Container className="mt-5">
+            <Container className="mt-5 cart-page-container">
                 <Card className="text-center p-5">
                     <Card.Body>
                         <div className="empty-cart-icon mb-4">🛒</div>
@@ -71,7 +71,7 @@ const Cart = () => {
     }
 
     return (
-        <Container className="mt-4">
+        <Container className="mt-4 cart-page-container">
             <Row>
                 <Col>
                     <h2 className="mb-4">🛒 Mi Carrito de Compras</h2>

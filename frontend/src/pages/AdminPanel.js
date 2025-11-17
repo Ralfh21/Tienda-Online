@@ -172,6 +172,7 @@ function AdminPanel() {
                 </h4>
             </Alert>
 
+            <center>
             <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
                 <h2 className="fw-bold">Panel de Administración</h2>
                 {!showForm && (
@@ -180,6 +181,7 @@ function AdminPanel() {
                     </Button>
                 )}
             </div>
+            </center>
 
             {alert.show && (
                 <Alert variant={alert.variant} className="rounded-3 shadow-sm">
@@ -187,6 +189,7 @@ function AdminPanel() {
                 </Alert>
             )}
 
+            <center>
             <Row className="justify-content-center">
                 {showForm ? (
                     <Col lg={8} md={10} className="mb-4">
@@ -324,6 +327,7 @@ function AdminPanel() {
                 </Col>
                 )}
             </Row>
+            </center>
         </Container>
     );
 }

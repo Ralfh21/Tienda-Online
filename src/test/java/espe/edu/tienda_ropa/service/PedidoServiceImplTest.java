@@ -3,7 +3,9 @@ package espe.edu.tienda_ropa.service;
 import espe.edu.tienda_ropa.domain.Pedido;
 import espe.edu.tienda_ropa.dto.PedidoRequestData;
 import espe.edu.tienda_ropa.dto.PedidoResponse;
+import espe.edu.tienda_ropa.repository.DetallePedidoDomainRepository;
 import espe.edu.tienda_ropa.repository.PedidoDomainRepository;
+import espe.edu.tienda_ropa.repository.ProductoDomainRepository;
 import espe.edu.tienda_ropa.service.impl.PedidoServiceImpl;
 import espe.edu.tienda_ropa.web.advice.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,13 +25,17 @@ class PedidoServiceImplTest {
 
     private PedidoDomainRepository repo;
     private DetallePedidoService detalleService;
+    private DetallePedidoDomainRepository detalleRepo;
+    private ProductoDomainRepository productoRepo;
     private PedidoServiceImpl service;
 
     @BeforeEach
     void setUp() {
         repo = mock(PedidoDomainRepository.class);
-        detalleService = mock(DetallePedidoService.class); // NUEVO ✔
-        service = new PedidoServiceImpl(repo, detalleService); // NUEVO ✔
+        detalleService = mock(DetallePedidoService.class);
+        detalleRepo = mock(DetallePedidoDomainRepository.class);
+        productoRepo = mock(ProductoDomainRepository.class);
+        service = new PedidoServiceImpl(repo, detalleService, detalleRepo, productoRepo);
     }
 
     @Test

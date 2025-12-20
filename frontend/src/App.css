@@ -281,6 +281,8 @@ h6 { font-size: 1rem; }
     color: var(--black) !important;
     letter-spacing: 0.5px;
     transition: var(--transition);
+    text-decoration: none !important;
+    border-bottom: none !important;
 }
 
 .navbar-brand:hover {
@@ -300,6 +302,8 @@ h6 { font-size: 1rem; }
     padding: 0.5rem 1rem !important;
     border-radius: var(--border-radius);
     transition: var(--transition);
+    text-decoration: none !important;
+    border-bottom: none !important;
 }
 
 .nav-link:hover {

@@ -198,4 +198,4 @@ implementation 'io.projectreactor:reactor-core:3.6.5'
 
 **Implementado por: Camila - Arquitecta Reactiva**  
 **Fecha: Diciembre 2024**  
-**Estado: Completado y Funcional**
+**Estado: Completado y Funcional aja**

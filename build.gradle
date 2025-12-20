@@ -32,6 +32,8 @@ dependencies {
 
     // Base de datos en memoria (solo desarrollo/test)
     implementation 'com.h2database:h2'
+    implementation 'io.projectreactor:reactor-core:3.6.5'
+
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'

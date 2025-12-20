@@ -41,8 +41,13 @@ public class SecurityConfig {
                         // 🔓 AGREGADO: permitir crear detalles de pedidos
                         .requestMatchers("/api/detalle-pedidos/**").permitAll()
 
+
+                        .requestMatchers("/reactive/**").permitAll()
                         // Todo lo demás, requiere autenticación
                         .anyRequest().authenticated()
+
+
+
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -59,4 +64,5 @@ public class SecurityConfig {
             throws Exception {
         return configuration.getAuthenticationManager();
     }
+
 }

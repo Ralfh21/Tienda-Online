@@ -3,6 +3,11 @@ package espe.edu.tienda_ropa.web.controller;
 import espe.edu.tienda_ropa.reactive.OrderSubscriber;
 import espe.edu.tienda_ropa.reactive.ProductSubscriber;
 import espe.edu.tienda_ropa.reactive.ReactiveProductService;
+import espe.edu.tienda_ropa.reactive.ReactiveOrderService;
+import espe.edu.tienda_ropa.domain.Pedido;
+import espe.edu.tienda_ropa.domain.DetallePedido;
+import espe.edu.tienda_ropa.repository.PedidoDomainRepository;
+import espe.edu.tienda_ropa.repository.DetallePedidoDomainRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -12,6 +17,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
@@ -20,6 +26,15 @@ public class ReactiveOrderController {
 
     @Autowired
     private ReactiveProductService reactiveProductService;
+
+    @Autowired
+    private ReactiveOrderService reactiveOrderService;
+
+    @Autowired
+    private PedidoDomainRepository pedidoRepository;
+
+    @Autowired
+    private DetallePedidoDomainRepository detallePedidoRepository;
 
     // ================================
     // DEMOSTRACIÓN BÁSICA DE FLUJO REACTIVO
@@ -182,5 +197,58 @@ public class ReactiveOrderController {
 
         System.out.println("==============================================\n");
         return "Flujo combinado iniciado. Revisa la consola.";
+    }
+
+    // ================================
+    // PROCESAMIENTO REACTIVO DE PEDIDOS REALES
+    // ================================
+    @GetMapping("/real-order/{id}")
+    public String processRealOrder(@PathVariable Long id) {
+        System.out.println("\nPROCESAMIENTO REACTIVO DE PEDIDO REAL");
+
+        try {
+            Optional<Pedido> pedidoOpt = pedidoRepository.findById(id);
+
+            if (pedidoOpt.isPresent()) {
+                Pedido pedido = pedidoOpt.get();
+                reactiveOrderService.procesarPedidoReal(pedido);
+                return "Procesamiento reactivo del pedido #" + id + " iniciado. Revisa la consola para ver el flujo.";
+            } else {
+                return "Pedido #" + id + " no encontrado. Creando pedido de demostración...";
+            }
+        } catch (Exception e) {
+            System.out.println("Error procesando pedido real: " + e.getMessage());
+            return "Error al procesar pedido #" + id + ": " + e.getMessage();
+        }
+    }
+
+    @GetMapping("/all-orders")
+    public String processAllOrders() {
+        System.out.println("\nPROCESAMIENTO REACTIVO DE TODOS LOS PEDIDOS");
+
+        try {
+            List<Pedido> pedidos = pedidoRepository.findAll();
+
+            if (pedidos.isEmpty()) {
+                return "No hay pedidos en la base de datos para procesar.";
+            }
+
+            System.out.println("Procesando " + pedidos.size() + " pedidos de forma reactiva...");
+
+            // Procesar cada pedido de forma reactiva
+            for (Pedido pedido : pedidos) {
+                List<DetallePedido> detalles = detallePedidoRepository.findByPedidoId(pedido.getId());
+                if (detalles != null && !detalles.isEmpty()) {
+                    reactiveOrderService.procesarPedidoReal(pedido);
+                } else {
+                    System.out.println("Saltando pedido #" + pedido.getId() + " - Sin detalles");
+                }
+            }
+
+            return "Procesamiento reactivo de " + pedidos.size() + " pedidos iniciado. Revisa la consola.";
+        } catch (Exception e) {
+            System.out.println("Error procesando pedidos: " + e.getMessage());
+            return "Error al procesar pedidos: " + e.getMessage();
+        }
     }
 }

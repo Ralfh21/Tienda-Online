@@ -15,6 +15,8 @@ import espe.edu.tienda_ropa.web.advice.ConflictException;
 import espe.edu.tienda_ropa.web.advice.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import espe.edu.tienda_ropa.reactive.ReactiveOrderService;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,14 +28,24 @@ public class PedidoServiceImpl implements PedidoService {
     private final DetallePedidoService detalleService;
     private final DetallePedidoDomainRepository detalleRepo;
     private final ProductoDomainRepository productoRepo;
+    private final ReactiveOrderService reactiveOrderService;
 
 
-    public PedidoServiceImpl(PedidoDomainRepository repo, DetallePedidoService detalleService, DetallePedidoDomainRepository detalleRepo, ProductoDomainRepository productoRepo) {
+
+    public PedidoServiceImpl(PedidoDomainRepository repo,
+                             DetallePedidoService detalleService,
+                             DetallePedidoDomainRepository detalleRepo,
+                             ProductoDomainRepository productoRepo,
+                             ReactiveOrderService reactiveOrderService) {
+
         this.repo = repo;
         this.detalleService = detalleService;
         this.detalleRepo = detalleRepo;
         this.productoRepo = productoRepo;
+        this.reactiveOrderService = reactiveOrderService;
     }
+
+
 
     @Override
     public PedidoResponse create(PedidoRequestData request) {
@@ -149,7 +161,13 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.setEstado(Pedido.EstadoPedido.COMPLETADO);
-        return toResponse(repo.save(pedido));
+        Pedido pedidoGuardado = repo.save(pedido);
+
+        // 🔥 DISPARAR FLUJO REACTIVO REAL
+        reactiveOrderService.procesarPedidoReal(pedidoGuardado);
+
+        return toResponse(pedidoGuardado);
+
     }
 
 
@@ -165,4 +183,5 @@ public class PedidoServiceImpl implements PedidoService {
         r.setDireccionEnvio(pedido.getDireccionEnvio());
         return r;
     }
+
 }

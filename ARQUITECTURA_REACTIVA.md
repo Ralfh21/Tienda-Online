@@ -55,6 +55,8 @@ Este proyecto implementa una **arquitectura reactiva** completa con **Subscriber
 | `GET` | `/reactive/orders/flux` | Stream de pedidos (Flux) |
 | `GET` | `/reactive/orders/{id}` | Pedido específico (Mono) |
 | `GET` | `/reactive/combined-flow` | Flujo combinado con backpressure |
+| `GET` | `/reactive/real-order/{id}` | **Procesar pedido real de BD** |
+| `GET` | `/reactive/all-orders` | **Procesar todos los pedidos de BD** |
 | `POST` | `/reactive/orders/process` | Procesamiento reactivo de pedidos |
 | `POST` | `/reactive/customer-order` | Pedido de cliente reactivo |
 
@@ -65,9 +67,9 @@ Este proyecto implementa una **arquitectura reactiva** completa con **Subscriber
 ./gradlew bootRun
 ```
 
-### 2. La aplicación se ejecuta en el puerto 9090:
+### 2. La aplicación se ejecuta en el puerto 8080:
 ```
-http://localhost:9090
+http://localhost:8080
 ```
 
 ### 3. Ver la demostración automática en consola:
@@ -77,17 +79,17 @@ Al iniciar, verás automáticamente las demos reactivas ejecutándose (si está 
 
 **Demo básico:**
 ```bash
-curl http://localhost:9090/reactive/orders/demo
+curl http://localhost:8080/reactive/orders/demo
 ```
 
 **Flujo de productos:**
 ```bash
-curl http://localhost:9090/reactive/products/demo
+curl http://localhost:8080/reactive/products/demo
 ```
 
 **Pedido de cliente (POST):**
 ```bash
-curl -X POST http://localhost:9090/reactive/customer-order \
+curl -X POST http://localhost:8080/reactive/customer-order \
   -H "Content-Type: application/json" \
   -d '{
     "customerName": "Juan Pérez",
@@ -97,7 +99,17 @@ curl -X POST http://localhost:9090/reactive/customer-order \
 
 **Flujo de pedidos en tiempo real:**
 ```bash
-curl http://localhost:9090/reactive/orders/flux
+curl http://localhost:8080/reactive/orders/flux
+```
+
+**Procesar pedido real de BD:**
+```bash
+curl http://localhost:8080/reactive/real-order/1
+```
+
+**Procesar todos los pedidos:**
+```bash
+curl http://localhost:8080/reactive/all-orders
 ```
 
 ## Correcciones Realizadas

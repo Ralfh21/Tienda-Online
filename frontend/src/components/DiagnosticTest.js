@@ -13,6 +13,7 @@ function DiagnosticTest() {
             
             // Probar con testConnection primero
             const testResult = await testConnection();
+
             console.log('Resultado testConnection:', testResult);
             
             // Probar directamente con productoService

@@ -19,6 +19,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Tests unitarios para ProductoServiceImpl.
+ * Verifica la lógica de negocio para la gestión de productos:
+ * creación con validación de nombre único y categoría existente.
+ */
 class ProductoServiceImplTest {
 
     private ProductoDomainRepository repo;
@@ -32,6 +37,14 @@ class ProductoServiceImplTest {
         service = new ProductoServiceImpl(repo, categoriaRepo);
     }
 
+    /**
+     * Test: Crear producto exitosamente.
+     * Verifica que al crear un producto con nombre único y categoría válida:
+     * - Se guarda correctamente en el repositorio
+     * - Se retorna ProductoResponse con todos los datos incluido nombre de
+     * categoría
+     * - Se valida la existencia de la categoría antes de guardar
+     */
     @Test
     void testCreateProducto_Success() {
         // Mock request
@@ -79,6 +92,11 @@ class ProductoServiceImplTest {
         verify(repo).save(ArgumentMatchers.any(Producto.class));
     }
 
+    /**
+     * Test: Conflicto al crear producto con nombre duplicado.
+     * Verifica que al intentar crear un producto con un nombre
+     * que ya existe en el sistema, se lanza ConflictException.
+     */
     @Test
     void testCreateProducto_Conflict() {
         ProductoRequestData req = new ProductoRequestData();
@@ -90,6 +108,11 @@ class ProductoServiceImplTest {
         assertEquals("El nombre del producto ya esta registrado", exception.getMessage());
     }
 
+    /**
+     * Test: Crear producto con categoría inexistente.
+     * Verifica que al crear un producto referenciando una categoría
+     * que no existe, se lanza NotFoundException.
+     */
     @Test
     void testCreateProducto_CategoriaNotFound() {
         ProductoRequestData req = new ProductoRequestData();

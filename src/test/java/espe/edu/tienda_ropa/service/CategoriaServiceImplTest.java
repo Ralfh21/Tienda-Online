@@ -16,17 +16,32 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Tests unitarios para CategoriaServiceImpl.
+ * Verifica la lógica de negocio para operaciones CRUD de categorías.
+ */
 class CategoriaServiceImplTest {
 
     private CategoriaDomainRepository repo;
     private CategoriaServiceImpl service;
 
+    /**
+     * Configuración inicial antes de cada test.
+     * Se crean mocks del repositorio y se inyectan al servicio.
+     */
     @BeforeEach
     void setUp() {
         repo = mock(CategoriaDomainRepository.class);
         service = new CategoriaServiceImpl(repo);
     }
 
+    /**
+     * Test: Crear categoría exitosamente.
+     * Verifica que al crear una categoría con nombre único:
+     * - Se guarda correctamente en el repositorio
+     * - Se retorna un CategoriaResponse con los datos correctos
+     * - La categoría se marca como activa por defecto
+     */
     @Test
     void testCreateCategoria_Success() {
         CategoriaRequestData req = new CategoriaRequestData();
@@ -53,6 +68,11 @@ class CategoriaServiceImplTest {
         verify(repo).save(any(Categoria.class));
     }
 
+    /**
+     * Test: Conflicto al crear categoría con nombre duplicado.
+     * Verifica que al intentar crear una categoría con un nombre
+     * que ya existe, se lanza ConflictException con mensaje apropiado.
+     */
     @Test
     void testCreateCategoria_Conflict() {
         CategoriaRequestData req = new CategoriaRequestData();
@@ -64,6 +84,11 @@ class CategoriaServiceImplTest {
         assertEquals("El nombre de categoria ya esta registrado", ex.getMessage());
     }
 
+    /**
+     * Test: Obtener categoría por ID exitosamente.
+     * Verifica que al buscar una categoría existente por su ID,
+     * se retorna correctamente el CategoriaResponse con todos los datos.
+     */
     @Test
     void testGetById_Success() {
         Categoria categoria = new Categoria();
@@ -80,6 +105,11 @@ class CategoriaServiceImplTest {
         assertEquals("Ropa", response.getNombre());
     }
 
+    /**
+     * Test: Categoría no encontrada por ID.
+     * Verifica que al buscar una categoría con ID inexistente,
+     * se lanza NotFoundException con el mensaje "Categoria no encontrada".
+     */
     @Test
     void testGetById_NotFound() {
         when(repo.findById(1L)).thenReturn(Optional.empty());
@@ -88,6 +118,11 @@ class CategoriaServiceImplTest {
         assertEquals("Categoria no encontrada", ex.getMessage());
     }
 
+    /**
+     * Test: Listar todas las categorías.
+     * Verifica que el método list() retorna correctamente
+     * una lista de CategoriaResponse con todas las categorías del sistema.
+     */
     @Test
     void testListCategorias() {
         Categoria c1 = new Categoria();

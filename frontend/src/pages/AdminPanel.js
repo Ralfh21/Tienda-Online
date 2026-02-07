@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import "../styles/AdminPanel.css";
 
 function AdminPanel() {
-    const { user } = useAuth();
+    useAuth(); // Verifica autenticación
     const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [showForm, setShowForm] = useState(false);

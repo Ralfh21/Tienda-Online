@@ -6,6 +6,7 @@ import espe.edu.tienda_ropa.dto.PedidoResponse;
 import espe.edu.tienda_ropa.repository.DetallePedidoDomainRepository;
 import espe.edu.tienda_ropa.repository.PedidoDomainRepository;
 import espe.edu.tienda_ropa.repository.ProductoDomainRepository;
+import espe.edu.tienda_ropa.reactive.ReactiveOrderService;
 import espe.edu.tienda_ropa.service.impl.PedidoServiceImpl;
 import espe.edu.tienda_ropa.web.advice.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ class PedidoServiceImplTest {
     private DetallePedidoService detalleService;
     private DetallePedidoDomainRepository detalleRepo;
     private ProductoDomainRepository productoRepo;
+    private ReactiveOrderService reactiveOrderService;
     private PedidoServiceImpl service;
 
     @BeforeEach
@@ -35,7 +37,8 @@ class PedidoServiceImplTest {
         detalleService = mock(DetallePedidoService.class);
         detalleRepo = mock(DetallePedidoDomainRepository.class);
         productoRepo = mock(ProductoDomainRepository.class);
-        service = new PedidoServiceImpl(repo, detalleService, detalleRepo, productoRepo);
+        reactiveOrderService = mock(ReactiveOrderService.class);
+        service = new PedidoServiceImpl(repo, detalleService, detalleRepo, productoRepo, reactiveOrderService);
     }
 
     @Test

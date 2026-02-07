@@ -18,17 +18,36 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Tests unitarios para ClienteServiceImpl.
+ * Verifica la lógica de negocio para operaciones CRUD de clientes:
+ * creación, consulta por ID, listado y desactivación.
+ * 
+ * Utiliza Mockito para simular el repositorio y aislar la lógica del servicio.
+ */
 class ClienteServiceImplTest {
 
     private ClienteDomainRepository repo;
     private ClienteServiceImpl service;
 
+    /**
+     * Configuración inicial antes de cada test.
+     * Se crea un mock del repositorio y se inyecta al servicio.
+     */
     @BeforeEach
     void setUp() {
         repo = mock(ClienteDomainRepository.class);
         service = new ClienteServiceImpl(repo);
     }
 
+    /**
+     * Test: Crear cliente exitosamente.
+     * Verifica que al crear un cliente con email único:
+     * - Se guarda correctamente en el repositorio
+     * - Se retorna ClienteResponse con todos los datos
+     * - El cliente se marca como activo por defecto
+     * - Se registra fecha de creación automáticamente
+     */
     @Test
     @DisplayName("Crear cliente exitosamente")
     void testCreateCliente_Success() {
@@ -67,6 +86,12 @@ class ClienteServiceImplTest {
         verify(repo).save(any(Cliente.class));
     }
 
+    /**
+     * Test: Conflicto al crear cliente con email duplicado.
+     * Verifica que al intentar registrar un cliente con un email
+     * que ya existe en el sistema, se lanza ConflictException.
+     * El sistema no permite emails duplicados para evitar confusión de cuentas.
+     */
     @Test
     @DisplayName("Crear cliente con email duplicado lanza ConflictException")
     void testCreateCliente_Conflict() {
@@ -82,6 +107,11 @@ class ClienteServiceImplTest {
         assertEquals("El email ya esta registrado", ex.getMessage(), "El mensaje de excepción debe coincidir");
     }
 
+    /**
+     * Test: Obtener cliente por ID exitosamente.
+     * Verifica que al buscar un cliente existente por su ID,
+     * se retorna correctamente el ClienteResponse con todos sus datos.
+     */
     @Test
     @DisplayName("Obtener cliente por ID exitosamente")
     void testGetById_Success() {
@@ -101,6 +131,11 @@ class ClienteServiceImplTest {
         assertEquals("Juan", response.getNombre(), "El nombre debe ser Juan");
     }
 
+    /**
+     * Test: Cliente no encontrado por ID.
+     * Verifica que al buscar un cliente con ID que no existe,
+     * se lanza NotFoundException con mensaje apropiado.
+     */
     @Test
     @DisplayName("Obtener cliente por ID inexistente lanza NotFoundException")
     void testGetById_NotFound() {
@@ -113,6 +148,11 @@ class ClienteServiceImplTest {
         assertEquals("Cliente no encontrado", ex.getMessage(), "El mensaje de excepción debe coincidir");
     }
 
+    /**
+     * Test: Listar todos los clientes.
+     * Verifica que el método list() retorna correctamente
+     * una lista con todos los clientes registrados en el sistema.
+     */
     @Test
     @DisplayName("Listar clientes devuelve lista correctamente")
     void testListClientes() {
@@ -137,6 +177,13 @@ class ClienteServiceImplTest {
         assertEquals("Maria", list.get(1).getNombre(), "Segundo cliente debe ser Maria");
     }
 
+    /**
+     * Test: Desactivar cliente exitosamente.
+     * Verifica que al desactivar un cliente existente:
+     * - El campo 'activo' cambia de true a false
+     * - Se guarda el cambio en el repositorio
+     * Nota: Usamos soft-delete para mantener historial de clientes.
+     */
     @Test
     @DisplayName("Desactivar cliente exitosamente")
     void testDeactivateCliente_Success() {
@@ -155,6 +202,11 @@ class ClienteServiceImplTest {
         verify(repo).save(any(Cliente.class));
     }
 
+    /**
+     * Test: Desactivar cliente inexistente.
+     * Verifica que al intentar desactivar un cliente con ID
+     * que no existe, se lanza NotFoundException.
+     */
     @Test
     @DisplayName("Desactivar cliente inexistente lanza NotFoundException")
     void testDeactivateCliente_NotFound() {

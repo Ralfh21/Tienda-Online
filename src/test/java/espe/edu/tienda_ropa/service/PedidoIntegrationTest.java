@@ -18,6 +18,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test de integración para el flujo completo de pedidos.
+ * Utiliza contexto real de Spring Boot para verificar:
+ * - Interacción entre servicios y repositorios
+ * - Transacciones y persistencia en base de datos
+ * - Flujo completo: crear pedido → confirmar → verificar stock
+ * 
+ * @DirtiesContext limpia el contexto después de cada test para evitar
+ *                 interferencia entre pruebas.
+ */
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class PedidoIntegrationTest {
@@ -34,6 +44,20 @@ public class PedidoIntegrationTest {
     @Autowired
     private PedidoService pedidoService;
 
+    /**
+     * Test de integración: Crear y confirmar pedido.
+     * 
+     * Flujo probado:
+     * 1. Crear categoría y producto de prueba con stock inicial = 10
+     * 2. Crear un pedido con 2 unidades del producto
+     * 3. Confirmar el pedido
+     * 4. Verificar que el estado cambió a CONFIRMADO
+     * 5. Verificar que el stock se redujo de 10 a 8 unidades
+     * 
+     * Este test valida la integración entre:
+     * - PedidoService, ProductoRepository, CategoriaRepository
+     * - Lógica de reducción de stock al confirmar pedido
+     */
     @Test
     public void crearYConfirmarPedido_debeCambiarEstadoYReducirStock() {
         // Crear categoría de prueba

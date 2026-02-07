@@ -22,6 +22,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Tests unitarios para PedidoServiceImpl.
+ * Verifica la lógica de negocio para el ciclo de vida de pedidos:
+ * creación, consulta, listado y cancelación.
+ */
 class PedidoServiceImplTest {
 
     private PedidoDomainRepository repo;
@@ -41,6 +46,13 @@ class PedidoServiceImplTest {
         service = new PedidoServiceImpl(repo, detalleService, detalleRepo, productoRepo, reactiveOrderService);
     }
 
+    /**
+     * Test: Crear pedido exitosamente.
+     * Verifica que al crear un nuevo pedido:
+     * - Se guarda correctamente con estado PENDIENTE
+     * - Se asigna un ID al pedido
+     * - Se registran los datos del cliente y dirección de envío
+     */
     @Test
     void testCreatePedido_Success() {
 
@@ -69,6 +81,11 @@ class PedidoServiceImplTest {
         verify(repo).save(ArgumentMatchers.any(Pedido.class));
     }
 
+    /**
+     * Test: Obtener pedido por ID exitosamente.
+     * Verifica que al buscar un pedido existente,
+     * se retorna el PedidoResponse con los datos correctos.
+     */
     @Test
     void testGetById_Success() {
         Pedido pedido = new Pedido();
@@ -85,6 +102,11 @@ class PedidoServiceImplTest {
         verify(repo).findById(5L);
     }
 
+    /**
+     * Test: Pedido no encontrado por ID.
+     * Verifica que al buscar un pedido con ID inexistente,
+     * se lanza NotFoundException con mensaje apropiado.
+     */
     @Test
     void testGetById_NotFound() {
         when(repo.findById(99L)).thenReturn(Optional.empty());
@@ -94,6 +116,11 @@ class PedidoServiceImplTest {
         assertEquals("Pedido no encontrado", ex.getMessage());
     }
 
+    /**
+     * Test: Listar todos los pedidos.
+     * Verifica que el método list() retorna correctamente
+     * la lista completa de pedidos del sistema.
+     */
     @Test
     void testListPedidos() {
         Pedido p1 = new Pedido();
@@ -109,6 +136,12 @@ class PedidoServiceImplTest {
         verify(repo).findAll();
     }
 
+    /**
+     * Test: Cancelar pedido exitosamente.
+     * Verifica que al cancelar un pedido pendiente:
+     * - El estado cambia a CANCELADO
+     * - Se guarda el cambio en el repositorio
+     */
     @Test
     void testCancelPedido_Success() {
         Pedido pedido = new Pedido();
@@ -125,6 +158,11 @@ class PedidoServiceImplTest {
         verify(repo).save(pedido);
     }
 
+    /**
+     * Test: Cancelar pedido inexistente.
+     * Verifica que al intentar cancelar un pedido con ID
+     * que no existe, se lanza NotFoundException.
+     */
     @Test
     void testCancelPedido_NotFound() {
         when(repo.findById(100L)).thenReturn(Optional.empty());

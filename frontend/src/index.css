@@ -1,97 +1,54 @@
+/* ===== Base Styles ===== */
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f8f9fa;
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #ffffff;
+    color: #333333;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.navbar-brand {
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-.card {
-  transition: transform 0.2s ease-in-out;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
+/* ===== Product Image ===== */
 .product-image {
-  height: 200px;
-  object-fit: cover;
+    height: 200px;
+    object-fit: cover;
+    background-color: #f9fafb;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
-}
-
-.footer {
-  background-color: #343a40;
-  color: white;
-  padding: 2rem 0;
-  margin-top: 3rem;
-}
-
-.search-container {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.filter-sidebar {
-  background-color: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
+/* ===== Price Tag ===== */
 .price-tag {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #28a745;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1a1a1a;
 }
 
+/* ===== Stock Badge ===== */
 .stock-badge {
-  font-size: 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
-/* Responsive Typography */
-:root {
-  font-size: 16px;
+/* ===== Filter Sidebar ===== */
+.filter-sidebar {
+    background-color: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
 }
 
-@media (max-width: 1200px) {
-  :root {
-    font-size: 15px;
-  }
+/* ===== Search Container ===== */
+.search-container {
+    max-width: 400px;
+    margin: 0 auto;
 }
 
-@media (max-width: 992px) {
-  :root {
-    font-size: 14px;
-  }
-}
-
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .footer {
-    text-align: center;
-  }
+    .product-image {
+        height: 160px;
+    }
 }

@@ -1,9 +1,11 @@
 package espe.edu.tienda_ropa.service;
 
+import espe.edu.tienda_ropa.domain.Categoria;
 import espe.edu.tienda_ropa.domain.Producto;
 import espe.edu.tienda_ropa.dto.DetallePedidoRequestData;
 import espe.edu.tienda_ropa.dto.PedidoRequestData;
 import espe.edu.tienda_ropa.dto.PedidoResponse;
+import espe.edu.tienda_ropa.repository.CategoriaDomainRepository;
 import espe.edu.tienda_ropa.repository.PedidoDomainRepository;
 import espe.edu.tienda_ropa.repository.ProductoDomainRepository;
 import org.junit.jupiter.api.Test;
@@ -27,10 +29,19 @@ public class PedidoIntegrationTest {
     private PedidoDomainRepository pedidoRepo;
 
     @Autowired
+    private CategoriaDomainRepository categoriaRepo;
+
+    @Autowired
     private PedidoService pedidoService;
 
     @Test
     public void crearYConfirmarPedido_debeCambiarEstadoYReducirStock() {
+        // Crear categoría de prueba
+        Categoria categoria = new Categoria();
+        categoria.setNombre("Categoria Test");
+        categoria.setDescripcion("Descripcion de prueba");
+        Categoria savedCategoria = categoriaRepo.save(categoria);
+
         // Crear producto de prueba
         Producto p = new Producto();
         p.setNombre("Prueba");
@@ -39,6 +50,7 @@ public class PedidoIntegrationTest {
         p.setTalla("M");
         p.setColor("Negro");
         p.setStock(10);
+        p.setCategoria(savedCategoria);
         Producto saved = productoRepo.save(p);
 
         // Preparar pedido con detalle (usando clienteId fijo para test)
@@ -61,7 +73,8 @@ public class PedidoIntegrationTest {
         // Confirmar pedido
         PedidoResponse confirmado = pedidoService.confirm(creado.getId());
         assertNotNull(confirmado, "Respuesta de confirmación no debe ser nula");
-        assertEquals(espe.edu.tienda_ropa.domain.Pedido.EstadoPedido.CONFIRMADO, confirmado.getEstado(), "Estado debe ser CONFIRMADO");
+        assertEquals(espe.edu.tienda_ropa.domain.Pedido.EstadoPedido.CONFIRMADO, confirmado.getEstado(),
+                "Estado debe ser CONFIRMADO");
 
         // Verificar en BD
         var opt = pedidoRepo.findById(creado.getId());

@@ -2,7 +2,7 @@
 
 Este es un sistema completo de tienda de ropa con backend en Spring Boot y frontend en React.
 
-## Estructura del Proyecto
+## Estructura del 
 
 ```
 tienda_ropa/
@@ -30,7 +30,7 @@ tienda_ropa/
 
 ## 🚀 INICIO RÁPIDO - Ejecutar Backend y Frontend
 
-### ⚡ Opción 1: Automática (Más Fácil)
+### ⚡ Opción 1: Automática 
 
 ```bash
 # 🎯 EJECUTA ESTE COMANDO y listo:
